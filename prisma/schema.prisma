@@ -11,19 +11,18 @@ datasource db {
 }
 
 model User {
-  id                    String             @id @default(uuid())
-  firstName             String
-  lastName              String
-  email                 String             @unique
-  sessions              MagicLink[]
-  orgs                  UserOrg[]
-  isEmailVerified       Boolean            @default(false)
-  emailVerification     EmailVerification?
-  isOnboardingCompleted Boolean            @default(false)
-  isActive              Boolean            @default(true)
-  createdAt             DateTime           @default(now())
-  updatedAt             DateTime           @updatedAt
-
+  id                String             @id @default(uuid())
+  firstName         String
+  lastName          String
+  email             String             @unique
+  sessions          MagicLink[]
+  orgs              UserOrg[]
+  isEmailVerified   Boolean            @default(false)
+  emailVerification EmailVerification?
+  isOnboarded       Boolean            @default(false)
+  isActive          Boolean            @default(true)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
 }
 
 model EmailVerification {
@@ -62,23 +61,9 @@ model Org {
   id        String    @id @default(uuid())
   name      String
   users     UserOrg[]
-  invites   Invite[]
   isActive  Boolean   @default(true)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-}
-
-model Invite {
-  id        String   @id @default(uuid())
-  token     String
-  email     String
-  orgId     String
-  org       Org      @relation(fields: [orgId], references: [id])
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([email])
 }
 
 enum Role {

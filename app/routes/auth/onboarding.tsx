@@ -1,9 +1,22 @@
-import { ActionFunction, Link, LoaderFunction } from "remix";
-import { Form, useLoaderData, json, redirect, useActionData } from "remix";
+import type { ActionFunction, LoaderFunction } from "remix";
+import { Form, json, redirect, useActionData } from "remix";
 
-import type { User, UserOrg, Org, Invite } from "@prisma/client";
+import { Role, User } from "@prisma/client";
 import { db } from "~/utils/db.server";
-import { getUserId } from "~/utils/session.server";
+import { getUser, requireUserId } from "~/utils/session.server";
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const user = await getUser(request);
+  if (!user) {
+    throw new Response("Unauthorized", { status: 401 });
+  }
+
+  if (user.isOnboarded) {
+    return redirect("/app");
+  }
+
+  return {};
+};
 
 function validateName(name: unknown) {
   if (typeof name !== "string" || name.length < 3) {
@@ -24,183 +37,74 @@ type ActionData = {
 const badRequest = (data: ActionData) => json(data, { status: 400 });
 
 export const action: ActionFunction = async ({ request }) => {
-  const userId = await getUserId(request);
-
-  if (!userId) {
-    throw new Response("Error, no session found", { status: 400 });
-  }
-
-  const user = await db.user.findUnique({
-    where: { id: userId },
-    include: { orgs: { include: { org: true } } },
-  });
-
-  if (!user) {
-    throw new Response("Error, no user found", { status: 400 });
-  }
-
-  const invites = await db.invite.findMany({
-    where: { email: user.email, isActive: true },
-    include: { org: true },
-  });
+  const userId = await requireUserId(request);
 
   const form = await request.formData();
+  const name = form.get("name");
 
-  if (invites.length) {
-    const invites = form.getAll("invites");
-    if (invites.length) {
-      // Accept checked invites
-      // TODO
-    }
+  if (typeof name !== "string") {
+    return badRequest({
+      formError: `Form not submitted correctly.`,
+    });
   }
 
-  if (!user.orgs.length) {
-    const name = form.get("name");
+  const fields = { name };
+  const fieldErrors = {
+    name: validateName(name),
+  };
+  if (Object.values(fieldErrors).some(Boolean)) {
+    return badRequest({ fieldErrors, fields });
+  }
 
-    if (typeof name !== "string") {
-      return badRequest({
-        formError: `Form not submitted correctly.`,
-      });
-    }
-
-    const fields = { name };
-    const fieldErrors = {
-      name: validateName(name),
-    };
-    if (Object.values(fieldErrors).some(Boolean)) {
-      return badRequest({ fieldErrors, fields });
-    }
-
+  try {
     const org = await db.org.create({ data: { name } });
+    await db.userOrg.create({
+      data: { userId, orgId: org.id, role: Role.OWNER },
+    });
 
-    if (!org) {
-      throw new Response(
-        "Something went wrong trying to create a new organisation.",
-        {
-          status: 500,
-        }
-      );
-    }
+    await db.user.update({
+      data: { isOnboarded: true },
+      where: { id: userId },
+    });
+  } catch {
+    throw new Response("Something went wrong trying to onboard user.", {
+      status: 500,
+    });
   }
 
   return redirect("/app");
 };
 
-type LoaderData = {
-  user: User & {
-    orgs: (UserOrg & { org: Org })[];
-  };
-  invites: (Invite & { org: Org })[];
-};
-
-export const loader: LoaderFunction = async ({ request }) => {
-  const userId = await getUserId(request);
-
-  if (!userId) {
-    throw new Response("Error, no session found", { status: 400 });
-  }
-
-  const user = await db.user.findUnique({
-    where: { id: userId },
-    include: { orgs: { include: { org: true } } },
-  });
-
-  if (!user) {
-    throw new Response("Error, no user found", { status: 400 });
-  }
-
-  const invites = await db.invite.findMany({
-    where: { email: user.email, isActive: true },
-    include: { org: true },
-  });
-
-  const data: LoaderData = {
-    user,
-    invites,
-  };
-
-  if (user.isOnboardingCompleted) {
-    return redirect("/app");
-  }
-
-  return data;
-};
-
 export default function RegisterSentRoute() {
   const actionData = useActionData<ActionData>();
-  const data = useLoaderData<LoaderData>();
-
-  if (!data.user) {
-    throw new Error("User not found");
-  }
 
   return (
     <>
-      <p>Thanks for creating an account!</p>(
-      {!data.user.isEmailVerified ? (
-        <p>
-          You will receive a link at {data.user.email} to verify your email!
-        </p>
-      ) : null}
-      <Form method="post">
-        {data.invites.length ? (
-          <>
-            <p>You have other invites pending:</p>
-            <ul>
-              {data.invites.map((invite) => (
-                <li>
-                  <label>
-                    <input
-                      type="checkbox"
-                      name="invite"
-                      value={invite.org.id}
-                    ></input>{" "}
-                    {invite.org.name}
-                  </label>
-                </li>
-              ))}
-            </ul>
-            <button type="submit">Submit</button>
-          </>
-        ) : null}
-        {!data.user.orgs.length ? (
-          <>
-            <p>Create an organisation</p>
+      <p>Thanks for creating an account!</p>
 
-            <div>
-              <label htmlFor="name-input">Name</label>
-              <input
-                id="name-input"
-                name="name"
-                defaultValue={actionData?.fields?.name}
-                type="text"
-                aria-invalid={
-                  Boolean(actionData?.fieldErrors?.name) || undefined
-                }
-                aria-describedby={
-                  actionData?.fieldErrors?.name ? "name-error" : undefined
-                }
-              />
-              {actionData?.fieldErrors?.name ? (
-                <p
-                  className="form-validation-error"
-                  role="alert"
-                  id="name-error"
-                >
-                  {actionData?.fieldErrors.name}
-                </p>
-              ) : null}
-            </div>
-          </>
-        ) : null}
+      <p>Create an organisation</p>
+      <Form method="post">
+        <div>
+          <label htmlFor="name-input">Name</label>
+          <input
+            id="name-input"
+            name="name"
+            defaultValue={actionData?.fields?.name}
+            type="text"
+            aria-invalid={Boolean(actionData?.fieldErrors?.name) || undefined}
+            aria-describedby={
+              actionData?.fieldErrors?.name ? "name-error" : undefined
+            }
+          />
+          {actionData?.fieldErrors?.name ? (
+            <p className="form-validation-error" role="alert" id="name-error">
+              {actionData?.fieldErrors.name}
+            </p>
+          ) : null}
+        </div>
         {/* TODO: add language? */}
-        <label>
-          <input type="checkbox" name="terms"></input> Accept{" "}
-          <Link to="/terms" target="_blank">
-            terms and conditions
-          </Link>
-          .
-        </label>
+        {/* TODO: add terms? */}
+        <button type="submit">Continue</button>
       </Form>
     </>
   );

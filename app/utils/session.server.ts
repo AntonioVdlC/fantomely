@@ -9,15 +9,22 @@ type RegisterForm = {
   email: string;
   firstName: string;
   lastName: string;
-  inviteToken: string;
 };
 
 type LoginForm = {
   email: string;
-  otp: string;
+  token: string;
 };
 
-export async function generateMagicLink(user: User) {
+export async function generateMagicLink(email: string) {
+  const user = await db.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    return null;
+  }
+
   const token = crypto.randomBytes(32).toString("hex");
   const validUntil = new Date(Date.now() + 15 * 60 * 1000); // in 15 minutes
 
@@ -38,38 +45,12 @@ export async function generateEmailVerification(user: User) {
   return emailVerification;
 }
 
-export async function register({
-  email,
-  firstName,
-  lastName,
-  inviteToken,
-}: RegisterForm) {
+export async function register({ email, firstName, lastName }: RegisterForm) {
   const userExists = await db.user.findFirst({
     where: { email },
   });
   if (userExists) {
     return null;
-  }
-
-  let orgId;
-  if (inviteToken) {
-    // The user has been invited to an existing organisation
-    // Retrieve the organisation from the invite token
-    const invite = await db.invite.findFirst({
-      where: { email, token: inviteToken, isActive: true },
-    });
-
-    if (!invite) {
-      return null;
-    }
-
-    orgId = invite.orgId;
-
-    // Invalidate the invite
-    await db.invite.updateMany({
-      data: { isActive: false },
-      where: { email, token: inviteToken },
-    });
   }
 
   // Create user
@@ -78,30 +59,18 @@ export async function register({
       email,
       firstName,
       lastName,
-      // We consider the email as verified if the user has been invited
-      isEmailVerified: Boolean(orgId),
     },
   });
 
-  // Create user-org relationship
-  if (orgId) {
-    await db.userOrg.create({
-      data: {
-        userId: user.id,
-        orgId,
-      },
-    });
-  } else {
-    // Send confirmation email
-    // TODO
-    const emailVerification = await generateEmailVerification(user);
-    console.log(emailVerification);
-  }
+  // Send confirmation email
+  // TODO
+  const emailVerification = await generateEmailVerification(user);
+  console.log(emailVerification);
 
   return user;
 }
 
-export async function login({ email, otp }: LoginForm) {
+export async function login({ email, token }: LoginForm) {
   const user = await db.user.findUnique({
     where: { email },
   });
@@ -110,12 +79,12 @@ export async function login({ email, otp }: LoginForm) {
     return null;
   }
 
-  // Login with OTP
+  // Login with Token
   const magicLink = await db.magicLink.findFirst({
     where: {
       userId: user.id,
       isUsed: false,
-      validUntil: { lt: new Date(Date.now()) },
+      validUntil: { gte: new Date(Date.now()) },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -124,9 +93,19 @@ export async function login({ email, otp }: LoginForm) {
     return null;
   }
 
-  const isCorrectOTP = magicLink.token === otp;
+  const isCorrectToken = magicLink.token === token;
 
-  if (!isCorrectOTP) {
+  if (!isCorrectToken) {
+    return null;
+  }
+
+  // Set magic link as used
+  try {
+    await db.magicLink.update({
+      data: { isUsed: true },
+      where: { id: magicLink.id },
+    });
+  } catch {
     return null;
   }
 
@@ -202,7 +181,7 @@ export async function getUser(request: Request) {
 
 export async function logout(request: Request) {
   const session = await storage.getSession(request.headers.get("Cookie"));
-  return redirect("/login", {
+  return redirect("/auth/logout/callback", {
     headers: {
       "Set-Cookie": await storage.destroySession(session),
     },

@@ -1,7 +1,6 @@
-import type { ActionFunction, MetaFunction } from "remix";
+import { ActionFunction, LoaderFunction, MetaFunction, redirect } from "remix";
 import { useActionData, json, Link, Form, useSearchParams } from "remix";
-import { db } from "~/utils/db.server";
-import { createUserSession, login } from "~/utils/session.server";
+import { generateMagicLink, getUserId } from "~/utils/session.server";
 import isEmailValid from "~/utils/is-email-valid";
 
 export const meta: MetaFunction = () => {
@@ -11,23 +10,22 @@ export const meta: MetaFunction = () => {
   };
 };
 
+export const loader: LoaderFunction = async ({ request }) => {
+  const userId = await getUserId(request);
+
+  if (userId) {
+    // Redirect to the home page if they are already signed in.
+    return redirect("/app");
+  }
+
+  return null;
+};
+
 function validateEmail(email: unknown) {
   if (typeof email !== "string" || !isEmailValid(email)) {
     return `The email is invalid`;
   }
 }
-
-// function validateFirstName(firstName: unknown) {
-//   if (typeof firstName !== "string" || firstName.length < 1) {
-//     return `First names must be at least 1 character long`;
-//   }
-// }
-
-// function validateLastName(lastName: unknown) {
-//   if (typeof lastName !== "string" || lastName.length < 1) {
-//     return `Last names must be at least 1 character long`;
-//   }
-// }
 
 type ActionData = {
   formError?: string;
@@ -44,13 +42,9 @@ const badRequest = (data: ActionData) => json(data, { status: 400 });
 export const action: ActionFunction = async ({ request }) => {
   const form = await request.formData();
   const email = form.get("email");
-  const otp = form.get("otp");
-  const redirectTo = form.get("redirectTo") || "/jokes";
-  if (
-    typeof email !== "string" ||
-    typeof otp !== "string" ||
-    typeof redirectTo !== "string"
-  ) {
+  const redirectTo = form.get("redirectTo") || "/app";
+
+  if (typeof email !== "string" || typeof redirectTo !== "string") {
     return badRequest({
       formError: `Form not submitted correctly.`,
     });
@@ -64,33 +58,20 @@ export const action: ActionFunction = async ({ request }) => {
     return badRequest({ fieldErrors, fields });
   }
 
-  const user = await login({ email, otp });
-  if (!user) {
+  const magicLink = await generateMagicLink(email);
+  if (!magicLink) {
     return badRequest({
       fields,
-      formError: `Username/Password combination is incorrect`,
+      formError: `Unable to find a user with that email.`,
     });
   }
-  return createUserSession(user.id, redirectTo);
 
-  // case "register": {
-  //   const userExists = await db.user.findFirst({
-  //     where: { username },
-  //   });
-  //   if (userExists) {
-  //     return badRequest({
-  //       fields,
-  //       formError: `User with username ${username} already exists`,
-  //     });
-  //   }
-  //   const user = await register({ username, password });
-  //   if (!user) {
-  //     return badRequest({
-  //       fields,
-  //       formError: `Something went wrong trying to create a new user.`,
-  //     });
-  //   }
-  // }
+  // TODO: send email
+  console.log(
+    `/auth/login/callback?email=${email}&token=${magicLink.token}&redirectTo=${redirectTo}`
+  );
+
+  return redirect(`/auth/login/sent?email=${email}&redirectTo=${redirectTo}`);
 };
 
 export default function Login() {
@@ -111,73 +92,29 @@ export default function Login() {
             name="redirectTo"
             value={searchParams.get("redirectTo") ?? undefined}
           />
-          <fieldset>
-            <legend className="sr-only">Login or Register?</legend>
-            <label>
-              <input
-                type="radio"
-                name="loginType"
-                value="login"
-                defaultChecked={
-                  !actionData?.fields?.loginType ||
-                  actionData?.fields?.loginType === "login"
-                }
-              />{" "}
-              Login
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="loginType"
-                value="register"
-                defaultChecked={actionData?.fields?.loginType === "register"}
-              />{" "}
-              Register
-            </label>
-          </fieldset>
           <div>
-            <label htmlFor="username-input">Username</label>
+            <label htmlFor="email-input">Email</label>
             <input
               type="text"
-              id="username-input"
-              name="username"
-              defaultValue={actionData?.fields?.username}
-              aria-invalid={Boolean(actionData?.fieldErrors?.username)}
+              id="email-input"
+              name="email"
+              defaultValue={
+                actionData?.fields?.email ||
+                searchParams.get("email") ||
+                undefined
+              }
+              aria-invalid={Boolean(actionData?.fieldErrors?.email)}
               aria-describedby={
-                actionData?.fieldErrors?.username ? "username-error" : undefined
+                actionData?.fieldErrors?.email ? "email-error" : undefined
               }
             />
-            {actionData?.fieldErrors?.username ? (
+            {actionData?.fieldErrors?.email ? (
               <p
                 className="form-validation-error"
                 role="alert"
-                id="username-error"
+                id="email-error"
               >
-                {actionData?.fieldErrors.username}
-              </p>
-            ) : null}
-          </div>
-          <div>
-            <label htmlFor="password-input">Password</label>
-            <input
-              id="password-input"
-              name="password"
-              defaultValue={actionData?.fields?.password}
-              type="password"
-              aria-invalid={
-                Boolean(actionData?.fieldErrors?.password) || undefined
-              }
-              aria-describedby={
-                actionData?.fieldErrors?.password ? "password-error" : undefined
-              }
-            />
-            {actionData?.fieldErrors?.password ? (
-              <p
-                className="form-validation-error"
-                role="alert"
-                id="password-error"
-              >
-                {actionData?.fieldErrors.password}
+                {actionData?.fieldErrors.email}
               </p>
             ) : null}
           </div>
@@ -185,6 +122,16 @@ export default function Login() {
             {actionData?.formError ? (
               <p className="form-validation-error" role="alert">
                 {actionData?.formError}
+                <div>
+                  Don't have an account yet?
+                  <Link
+                    to={`/auth/register?email=${
+                      actionData?.fields?.email ?? ""
+                    }`}
+                  >
+                    Register instead!
+                  </Link>
+                </div>
               </p>
             ) : null}
           </div>
@@ -192,16 +139,6 @@ export default function Login() {
             Submit
           </button>
         </Form>
-      </div>
-      <div className="links">
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/jokes">Jokes</Link>
-          </li>
-        </ul>
       </div>
     </div>
   );

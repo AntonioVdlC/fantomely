@@ -1,10 +1,5 @@
-import { Outlet } from "remix";
+import { LoaderFunction, redirect } from "remix";
 
-export default function AppRoute() {
-  return (
-    <div>
-      This is the app!
-      <Outlet />
-    </div>
-  );
-}
+export const loader: LoaderFunction = async () => {
+  return redirect("/app/dashboard");
+};

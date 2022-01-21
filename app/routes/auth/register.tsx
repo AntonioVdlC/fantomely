@@ -1,15 +1,32 @@
-import { ActionFunction, MetaFunction, redirect } from "remix";
-import { Form, useActionData, useSearchParams, json } from "remix";
+import { Link } from "react-router-dom";
+import {
+  ActionFunction,
+  LoaderFunction,
+  MetaFunction,
+  useSearchParams,
+} from "remix";
+import { Form, useActionData, redirect, json } from "remix";
 import { db } from "~/utils/db.server";
 
 import isEmailValid from "~/utils/is-email-valid";
-import { createUserSession, register } from "~/utils/session.server";
+import { createUserSession, getUserId, register } from "~/utils/session.server";
 
 export const meta: MetaFunction = () => {
   return {
-    title: "Analytics Service | Login",
-    description: "Login to Analytics Service!",
+    title: "Analytics Service | Register",
+    description: "Register to Analytics Service!",
   };
+};
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const userId = await getUserId(request);
+
+  if (userId) {
+    // Redirect to the home page if they are already signed in.
+    return redirect("/app");
+  }
+
+  return null;
 };
 
 function validateEmail(email: unknown) {
@@ -51,7 +68,6 @@ export const action: ActionFunction = async ({ request }) => {
   const email = form.get("email");
   const firstName = form.get("first-name");
   const lastName = form.get("last-name");
-  const inviteToken = form.get("invite-token")?.toString() ?? "";
   if (
     typeof email !== "string" ||
     typeof firstName !== "string" ||
@@ -81,10 +97,11 @@ export const action: ActionFunction = async ({ request }) => {
       formError: `User already exists`,
     });
   }
-  const user = await register({ email, firstName, lastName, inviteToken });
+  const user = await register({ email, firstName, lastName });
   if (!user) {
-    throw new Response("Something went wrong trying to create a new user.", {
-      status: 500,
+    return badRequest({
+      fields,
+      formError: `User already exists`,
     });
   }
 
@@ -103,18 +120,17 @@ export default function RegisterRoute() {
           actionData?.formError ? "form-error-message" : undefined
         }
       >
-        <input
-          type="hidden"
-          name="invite-token"
-          value={searchParams.get("invite") ?? undefined}
-        />
         <div>
           <label htmlFor="email-input">Email</label>
           <input
             type="email"
             id="email-input"
             name="email"
-            defaultValue={actionData?.fields?.email}
+            defaultValue={
+              actionData?.fields?.email ||
+              searchParams.get("email") ||
+              undefined
+            }
             aria-invalid={Boolean(actionData?.fieldErrors?.email)}
             aria-describedby={
               actionData?.fieldErrors?.email ? "email-error" : undefined
@@ -178,9 +194,16 @@ export default function RegisterRoute() {
         </div>
         <div id="form-error-message">
           {actionData?.formError ? (
-            <p className="form-validation-error" role="alert">
-              {actionData?.formError}
-            </p>
+            <>
+              <p className="form-validation-error" role="alert">
+                {actionData?.formError}
+              </p>
+              <Link
+                to={`/auth/login?email=${actionData?.fields?.email || ""}`}
+              >
+                Sign in instead!
+              </Link>
+            </>
           ) : null}
         </div>
         <button type="submit" className="button">

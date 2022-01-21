@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String             @id @default(uuid())
+  firstName             String
+  lastName              String
+  email                 String             @unique
+  sessions              MagicLink[]
+  orgs                  UserOrg[]
+  isEmailVerified       Boolean            @default(false)
+  emailVerification     EmailVerification?
+  isOnboardingCompleted Boolean            @default(false)
+  isActive              Boolean            @default(true)
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+
+}
+
+model EmailVerification {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  isUsed    Boolean  @default(false)
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserOrg {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  orgId  String
+  org    Org    @relation(fields: [orgId], references: [id])
+  role   Role   @default(USER)
+
+  @@unique([userId, orgId])
+}
+
+model MagicLink {
+  id         String   @id @default(uuid())
+  token      String   @unique
+  validUntil DateTime
+  isUsed     Boolean  @default(false)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Org {
+  id        String    @id @default(uuid())
+  name      String
+  users     UserOrg[]
+  invites   Invite[]
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Invite {
+  id        String   @id @default(uuid())
+  token     String
+  email     String
+  orgId     String
+  org       Org      @relation(fields: [orgId], references: [id])
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+}
+
+enum Role {
+  USER
+  ADMIN
+  OWNER
+}

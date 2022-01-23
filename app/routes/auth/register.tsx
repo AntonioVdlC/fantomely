@@ -1,15 +1,16 @@
-import { Link } from "react-router-dom";
+import type { ActionFunction, LoaderFunction, MetaFunction } from "remix";
 import {
-  ActionFunction,
-  LoaderFunction,
-  MetaFunction,
+  Form,
+  useActionData,
+  redirect,
+  json,
   useSearchParams,
+  Link,
 } from "remix";
-import { Form, useActionData, redirect, json } from "remix";
-import { db } from "~/utils/db.server";
 
+import { db } from "~/utils/db.server";
 import isEmailValid from "~/utils/is-email-valid";
-import { createUserSession, getUserId, register } from "~/utils/session.server";
+import { generateMagicLink, getUserId, register } from "~/utils/session.server";
 
 export const meta: MetaFunction = () => {
   return {
@@ -105,7 +106,20 @@ export const action: ActionFunction = async ({ request }) => {
     });
   }
 
-  return createUserSession(user, `/auth/onboarding`);
+  const magicLink = await generateMagicLink(email);
+  if (!magicLink) {
+    return badRequest({
+      fields,
+      formError: `Unable to find a user with that email.`,
+    });
+  }
+
+  // TODO: send email
+  console.log(
+    `/auth/login/callback?email=${email}&token=${magicLink.token}&from=register`
+  );
+
+  return redirect(`/auth/login/sent?email=${email}&from=register`);
 };
 
 export default function RegisterRoute() {
@@ -192,15 +206,15 @@ export default function RegisterRoute() {
             </p>
           ) : null}
         </div>
+        {/* TODO: add terms? */}
+
         <div id="form-error-message">
           {actionData?.formError ? (
             <>
               <p className="form-validation-error" role="alert">
                 {actionData?.formError}
               </p>
-              <Link
-                to={`/auth/login?email=${actionData?.fields?.email || ""}`}
-              >
+              <Link to={`/auth/login?email=${actionData?.fields?.email || ""}`}>
                 Sign in instead!
               </Link>
             </>

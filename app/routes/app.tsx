@@ -1,7 +1,9 @@
 import { LoaderFunction, Outlet, redirect } from "remix";
-import { getUser } from "~/utils/session.server";
+import { getUser, requireValidSession } from "~/utils/session.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
+  await requireValidSession(request);
+
   const user = await getUser(request);
 
   if (!user) {

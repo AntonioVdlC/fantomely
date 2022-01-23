@@ -1,5 +1,13 @@
-import { ActionFunction, LoaderFunction, MetaFunction, redirect } from "remix";
-import { useActionData, json, Link, Form, useSearchParams } from "remix";
+import type { ActionFunction, LoaderFunction, MetaFunction } from "remix";
+import {
+  Form,
+  Link,
+  json,
+  redirect,
+  useActionData,
+  useSearchParams,
+} from "remix";
+
 import { generateMagicLink, getUserId } from "~/utils/session.server";
 import isEmailValid from "~/utils/is-email-valid";
 
@@ -101,7 +109,7 @@ export default function Login() {
               defaultValue={
                 actionData?.fields?.email ||
                 searchParams.get("email") ||
-                undefined
+                ""
               }
               aria-invalid={Boolean(actionData?.fieldErrors?.email)}
               aria-describedby={
@@ -120,7 +128,7 @@ export default function Login() {
           </div>
           <div id="form-error-message">
             {actionData?.formError ? (
-              <p className="form-validation-error" role="alert">
+              <div className="form-validation-error" role="alert">
                 {actionData?.formError}
                 <div>
                   Don't have an account yet?
@@ -132,7 +140,7 @@ export default function Login() {
                     Register instead!
                   </Link>
                 </div>
-              </p>
+              </div>
             ) : null}
           </div>
           <button type="submit" className="button">

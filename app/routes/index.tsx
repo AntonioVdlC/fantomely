@@ -1,6 +1,6 @@
-import { User } from "@prisma/client";
-import { LoaderFunction, MetaFunction, useLoaderData } from "remix";
-import { Link } from "remix";
+import type { LoaderFunction, MetaFunction } from "remix";
+import { Link, useLoaderData } from "remix";
+
 import { getUserId } from "~/utils/session.server";
 
 export const meta: MetaFunction = () => {
@@ -15,8 +15,7 @@ type LoaderData = {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const userId = getUserId(request);
-
+  const userId = await getUserId(request);
   const data = { userId };
 
   return data;

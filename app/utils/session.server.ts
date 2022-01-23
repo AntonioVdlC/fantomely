@@ -35,16 +35,6 @@ export async function generateMagicLink(email: string) {
   return magicLink;
 }
 
-export async function generateEmailVerification(user: User) {
-  const token = crypto.randomBytes(32).toString("hex");
-
-  const emailVerification = await db.emailVerification.create({
-    data: { token, userId: user.id },
-  });
-
-  return emailVerification;
-}
-
 export async function register({ email, firstName, lastName }: RegisterForm) {
   const userExists = await db.user.findFirst({
     where: { email },
@@ -61,11 +51,6 @@ export async function register({ email, firstName, lastName }: RegisterForm) {
       lastName,
     },
   });
-
-  // Send confirmation email
-  // TODO
-  const emailVerification = await generateEmailVerification(user);
-  console.log(emailVerification);
 
   return user;
 }
@@ -148,9 +133,38 @@ export async function requireUserId(
   const userId = session.get("userId");
   if (!userId || typeof userId !== "string") {
     const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
-    throw redirect(`/login?${searchParams}`);
+    throw redirect(`/auth/login?${searchParams}`, {
+      headers: {
+        "Set-Cookie": await storage.destroySession(session),
+      },
+    });
   }
   return userId;
+}
+
+export async function requireValidSession(
+  request: Request,
+  redirectTo: string = new URL(request.url).pathname
+) {
+  const session = await getUserSession(request);
+
+  try {
+    const userId = await requireUserId(request, redirectTo);
+    const user = await db.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new Error("User not found.");
+    }
+  } catch {
+    const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
+
+    throw redirect(`/auth/login?${searchParams}`, {
+      headers: {
+        "Set-Cookie": await storage.destroySession(session),
+      },
+    });
+  }
 }
 
 export async function createUserSession(user: User, redirectTo: string) {

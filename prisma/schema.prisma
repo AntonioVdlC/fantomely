@@ -16,34 +16,10 @@ model User {
   lastName          String
   email             String             @unique
   sessions          MagicLink[]
-  orgs              UserOrg[]
-  isEmailVerified   Boolean            @default(false)
-  emailVerification EmailVerification?
   isOnboarded       Boolean            @default(false)
   isActive          Boolean            @default(true)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
-}
-
-model EmailVerification {
-  id        String   @id @default(uuid())
-  token     String   @unique
-  isUsed    Boolean  @default(false)
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model UserOrg {
-  id     String @id @default(uuid())
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-  orgId  String
-  org    Org    @relation(fields: [orgId], references: [id])
-  role   Role   @default(USER)
-
-  @@unique([userId, orgId])
 }
 
 model MagicLink {
@@ -55,19 +31,4 @@ model MagicLink {
   user       User     @relation(fields: [userId], references: [id])
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-}
-
-model Org {
-  id        String    @id @default(uuid())
-  name      String
-  users     UserOrg[]
-  isActive  Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-}
-
-enum Role {
-  USER
-  ADMIN
-  OWNER
 }

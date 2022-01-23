@@ -1,5 +1,5 @@
 import { LoaderFunction, redirect } from "remix";
 
 export const loader: LoaderFunction = async () => {
-  return redirect("/app/dashboard");
+  return redirect("/app/home");
 };

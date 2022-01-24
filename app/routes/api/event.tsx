@@ -22,7 +22,6 @@ export const action: ActionFunction = async ({ request }) => {
       websiteId: website.id,
       path: payload.path,
       type: EventType.PAGEVIEW,
-      country: "TODO",
     },
   });
 

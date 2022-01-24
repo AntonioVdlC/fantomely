@@ -50,16 +50,12 @@ model Website {
 model Event {
   id        String    @id @default(uuid())
   type      EventType @default(PAGEVIEW)
-  // customType  String
-  // customProps String
   websiteId String
   website   Website   @relation(fields: [websiteId], references: [id])
   path      String
-  country   String
   createdAt DateTime  @default(now())
 }
 
 enum EventType {
   PAGEVIEW
-  // CUSTOM
 }

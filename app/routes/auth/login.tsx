@@ -9,7 +9,7 @@ import {
 } from "remix";
 
 import { generateMagicLink, getUserId } from "~/utils/session.server";
-import isEmailValid from "~/utils/is-email-valid";
+import { isValidEmail } from "~/utils/is-valid";
 
 export const meta: MetaFunction = () => {
   return {
@@ -30,7 +30,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 function validateEmail(email: unknown) {
-  if (typeof email !== "string" || !isEmailValid(email)) {
+  if (typeof email !== "string" || !isValidEmail(email)) {
     return `The email is invalid`;
   }
 }
@@ -107,9 +107,7 @@ export default function Login() {
               id="email-input"
               name="email"
               defaultValue={
-                actionData?.fields?.email ||
-                searchParams.get("email") ||
-                ""
+                actionData?.fields?.email || searchParams.get("email") || ""
               }
               aria-invalid={Boolean(actionData?.fieldErrors?.email)}
               aria-describedby={

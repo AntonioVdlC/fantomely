@@ -11,15 +11,16 @@ datasource db {
 }
 
 model User {
-  id                String             @id @default(uuid())
-  firstName         String
-  lastName          String
-  email             String             @unique
-  sessions          MagicLink[]
-  isOnboarded       Boolean            @default(false)
-  isActive          Boolean            @default(true)
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
+  id          String      @id @default(uuid())
+  firstName   String
+  lastName    String
+  email       String      @unique
+  sessions    MagicLink[]
+  isOnboarded Boolean     @default(false)
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  websites    Website[]
 }
 
 model MagicLink {
@@ -31,4 +32,34 @@ model MagicLink {
   user       User     @relation(fields: [userId], references: [id])
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model Website {
+  id            String   @id @default(uuid())
+  url           String
+  publicKey     String   @unique
+  events        Event[]
+  createdById   String
+  createdByUser User     @relation(fields: [createdById], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([url, createdById])
+}
+
+model Event {
+  id        String    @id @default(uuid())
+  type      EventType @default(PAGEVIEW)
+  // customType  String
+  // customProps String
+  websiteId String
+  website   Website   @relation(fields: [websiteId], references: [id])
+  path      String
+  country   String
+  createdAt DateTime  @default(now())
+}
+
+enum EventType {
+  PAGEVIEW
+  // CUSTOM
 }

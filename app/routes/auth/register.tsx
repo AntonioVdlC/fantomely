@@ -9,7 +9,7 @@ import {
 } from "remix";
 
 import { db } from "~/utils/db.server";
-import isEmailValid from "~/utils/is-email-valid";
+import { isValidEmail } from "~/utils/is-valid";
 import { generateMagicLink, getUserId, register } from "~/utils/session.server";
 
 export const meta: MetaFunction = () => {
@@ -31,7 +31,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 function validateEmail(email: unknown) {
-  if (typeof email !== "string" || !isEmailValid(email)) {
+  if (typeof email !== "string" || !isValidEmail(email)) {
     return `The email is invalid`;
   }
 }

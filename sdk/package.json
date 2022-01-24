@@ -11,7 +11,10 @@
     "dist/index.d.ts"
   ],
   "scripts": {
-    "build": "rollup -c",
+    "prebuild": "rm -rf dist && mkdir dist",
+    "build": "npm run build:types && npm run build:lib",
+    "build:types": "tsc --declaration --emitDeclarationOnly --outDir dist",
+    "build:lib": "rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

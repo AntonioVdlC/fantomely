@@ -44,9 +44,7 @@ class SDK {
         type,
       }),
     })
-      .then(() =>
-        console.log("Event sent successfully.")
-      )
+      .then(() => console.log("Event sent successfully."))
       .catch(console.error);
   }
 }
@@ -65,6 +63,17 @@ if (typeof window !== "undefined") {
       type: EventType.PAGEVIEW,
     });
   });
+
+  if (window.history.pushState) {
+    const pushState = window.history.pushState;
+    window.history.pushState = function (...args) {
+      sdk.send({
+        path: window.location.href,
+        type: EventType.PAGEVIEW,
+      });
+      pushState.apply(window.history, args);
+    };
+  }
 }
 
 export default sdk;

@@ -2,18 +2,10 @@
   "name": "sdk",
   "version": "0.0.0",
   "description": "",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist/index.cjs.js",
-    "dist/index.esm.js",
-    "dist/index.d.ts"
-  ],
+  "main": "",
   "scripts": {
     "prebuild": "rm -rf dist && mkdir dist",
-    "build": "npm run build:types && npm run build:lib",
-    "build:types": "tsc --declaration --emitDeclarationOnly --outDir dist",
+    "build": "npm run build:lib",
     "build:lib": "rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

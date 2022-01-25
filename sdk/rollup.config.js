@@ -5,7 +5,7 @@ export default [
   {
     input: "src/index.ts",
     output: {
-      file: "dist/index.js",
+      file: "dist/browser.js",
       format: "iife",
       name: "sdk", // TODO: change
     },

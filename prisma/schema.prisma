@@ -11,16 +11,94 @@ datasource db {
 }
 
 model User {
-  id          String      @id @default(uuid())
-  firstName   String
-  lastName    String
-  email       String      @unique
-  sessions    MagicLink[]
-  isOnboarded Boolean     @default(false)
-  isActive    Boolean     @default(true)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  websites    Website[]
+  id                   String         @id @default(uuid())
+  firstName            String
+  lastName             String
+  email                String         @unique
+  sessions             MagicLink[]
+  websites             Website[]
+  orgs                 UserOrg[]
+  createdSubscriptions Subscription[]
+  createdOrgs          Org[]
+  createdUserOrgs      UserOrg[]      @relation("creator")
+  isOnboarded          Boolean        @default(false)
+  isActive             Boolean        @default(true)
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+}
+
+model UserOrg {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  orgId         String
+  org           Org      @relation(fields: [orgId], references: [id])
+  role          Role     @default(USER)
+  isActive      Boolean  @default(true)
+  createdById   String
+  createdByUser User     @relation(name: "creator", fields: [createdById], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, orgId])
+}
+
+model Org {
+  id            String        @id @default(uuid())
+  name          String
+  users         UserOrg[]
+  websites      Website[]
+  subscription  Subscription?
+  isActive      Boolean       @default(true)
+  createdById   String
+  createdByUser User          @relation(fields: [createdById], references: [id])
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+  OWNER
+}
+
+model Plan {
+  id                  String         @id @default(uuid())
+  name                String
+  stripePriceId       String         @unique
+  priceValueInUSD     Int
+  includeEventsMax    Int
+  includeUsersMax     Int
+  includeWebsitesMax  Int
+  includeCustomEvents Boolean
+  subscriptions       Subscription[]
+  isActive            Boolean        @default(true)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+}
+
+model Subscription {
+  id                   String    @id @default(uuid())
+  planId               String
+  plan                 Plan      @relation(fields: [planId], references: [id])
+  orgId                String    @unique
+  org                  Org       @relation(fields: [orgId], references: [id])
+  invoices             Invoice[]
+  stripeCustomerId     String
+  stripeSubscriptionId String
+  createdById          String
+  createdByUser        User      @relation(fields: [createdById], references: [id])
+  isActive             Boolean   @default(true)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+}
+
+model Invoice {
+  id             String       @id @default(uuid())
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 }
 
 model MagicLink {
@@ -39,6 +117,8 @@ model Website {
   url           String
   publicKey     String   @unique
   events        Event[]
+  orgId         String
+  org           Org      @relation(fields: [orgId], references: [id])
   createdById   String
   createdByUser User     @relation(fields: [createdById], references: [id])
   createdAt     DateTime @default(now())

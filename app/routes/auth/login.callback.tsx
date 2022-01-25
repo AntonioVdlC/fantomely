@@ -27,7 +27,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 
   if (!user.isOnboarded) {
-    return createUserSession(user, "/auth/onboarding");
+    return createUserSession(user, "/onboarding");
   }
 
   return createUserSession(user, redirectTo);

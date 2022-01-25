@@ -1,6 +1,7 @@
 import { Event, Website } from "@prisma/client";
 import { LoaderFunction, redirect, useLoaderData } from "remix";
 import { db } from "~/utils/db.server";
+import { requireCurrentUser } from "~/utils/session.server";
 
 type LoaderData = {
   website: Website;
@@ -14,9 +15,15 @@ export const loader: LoaderFunction = async ({ request }) => {
     return redirect("/app/home");
   }
 
-  const website = await db.website.findUnique({ where: { id: websiteId } });
-  console.log(website);
-  const events = await db.event.findMany({ where: { websiteId } });
+  const user = await requireCurrentUser(request);
+  const website = await db.website.findFirst({
+    where: { id: websiteId, orgId: user.orgs[0].orgId },
+  });
+  if (!website) {
+    throw new Response("Website not found", { status: 404 });
+  }
+
+  const events = await db.event.findMany({ where: { websiteId: website.id } });
 
   return { website, events };
 };

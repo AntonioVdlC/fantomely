@@ -12,7 +12,8 @@
   },
   "scripts": {
     "build": "npm run build:sdk && remix build",
-    "build:sdk": "cd ./sdk && npm run build && cd .. && cp ./sdk/dist/index.js ./build/sdk/browser.js",
+    "prebuild:sdk": "rm -rf ./build/sdk && mkdir ./build/sdk",
+    "build:sdk": "cd ./sdk && npm run build && cd .. && cp ./sdk/dist/browser.js ./build/sdk/browser.js",
     "dev": "npm run build:sdk && remix dev",
     "postinstall": "remix setup node",
     "start": "remix-serve build"
@@ -23,17 +24,22 @@
     "@remix-run/serve": "^1.1.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "remix": "^1.1.1"
+    "remix": "^1.1.1",
+    "stripe": "^8.199.0"
   },
   "devDependencies": {
     "@remix-run/dev": "^1.1.1",
     "@types/react": "^17.0.24",
     "@types/react-dom": "^17.0.9",
+    "esbuild-register": "^3.3.2",
     "prisma": "^3.8.1",
     "typescript": "^4.1.2"
   },
   "engines": {
     "node": ">=14"
+  },
+  "prisma": {
+    "seed": "node --require esbuild-register prisma/seed.ts"
   },
   "sideEffects": false
 }

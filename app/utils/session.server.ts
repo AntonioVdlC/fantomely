@@ -141,6 +141,33 @@ export async function requireUserId(
   }
   return userId;
 }
+export async function requireCurrentUser(
+  request: Request,
+  redirectTo: string = new URL(request.url).pathname
+) {
+  const session = await getUserSession(request);
+
+  try {
+    const userId = await requireUserId(request, redirectTo);
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      include: { orgs: { include: { org: true } } },
+    });
+    if (!user) {
+      throw new Error("User not found.");
+    }
+
+    return user;
+  } catch {
+    const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
+
+    throw redirect(`/auth/login?${searchParams}`, {
+      headers: {
+        "Set-Cookie": await storage.destroySession(session),
+      },
+    });
+  }
+}
 
 export async function requireValidSession(
   request: Request,

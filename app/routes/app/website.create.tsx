@@ -3,7 +3,8 @@ import { ActionFunction, Form, json, redirect, useActionData } from "remix";
 import { db } from "~/utils/db.server";
 import { generatePublicKey } from "~/utils/api.server";
 import { isValidURL } from "~/utils/is-valid";
-import { requireUserId } from "~/utils/session.server";
+import { requireCurrentUser } from "~/utils/session.server";
+import { Website } from "@prisma/client";
 
 function validateURL(url: unknown) {
   if (typeof url !== "string" || !isValidURL(url)) {
@@ -21,15 +22,14 @@ type ActionData = {
   };
   response?: {
     success: Boolean;
-    publicKey: string;
+    website: Website;
   };
 };
 
 const badRequest = (data: ActionData) => json(data, { status: 400 });
 
 export const action: ActionFunction = async ({ request }) => {
-  console.log("---- action")
-  const userId = await requireUserId(request);
+  const user = await requireCurrentUser(request);
 
   const form = await request.formData();
 
@@ -55,7 +55,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   // Check URL not created in this account yet
   const existingWebsite = await db.website.findFirst({
-    where: { url: origin, createdById: userId },
+    where: { url: origin, createdById: user.id, orgId: user.orgs[0].orgId },
   });
   if (existingWebsite) {
     return redirect(`/app/website/edit/${existingWebsite.id}`);
@@ -64,16 +64,21 @@ export const action: ActionFunction = async ({ request }) => {
   // TODO: check website limit according to current plan
 
   // Generate new API public key
-  const publicKey = generatePublicKey()
+  const publicKey = generatePublicKey();
 
   // Save new website config in database
   const website = await db.website.create({
-    data: { url: origin, publicKey, createdById: userId },
+    data: {
+      url: origin,
+      publicKey,
+      createdById: user.id,
+      orgId: user.orgs[0].orgId,
+    },
   });
 
   const response = {
     success: true,
-    publicKey,
+    website,
   };
 
   const data = { fields, fieldErrors, response };
@@ -126,7 +131,7 @@ export default function WebsiteCreateRoute() {
           </p>
 
           <code>
-            {`<script src="${window?.location?.origin}/sdk.js?publicKey=${actionData?.response?.publicKey}"></script>`}
+            {`<script src="${window?.location?.origin}/sdk.js?publicKey=${actionData?.response?.website?.publicKey}"></script>`}
           </code>
         </div>
       ) : null}

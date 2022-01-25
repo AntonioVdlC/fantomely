@@ -8,20 +8,17 @@ export const loader: LoaderFunction = async ({ request }) => {
     return redirect("/auth/login");
   }
 
-  if (!user?.isOnboarded) {
-    return redirect("/onboarding");
+  if (user.isOnboarded) {
+    return redirect("/app");
   }
 
   return null;
 };
 
-export default function AppRoute() {
+export default function OnboardingRoute() {
   return (
     <>
-      <div>This is the app!</div>
-      <form method="post" action="/auth/logout">
-        <button type="submit">Logout</button>
-      </form>
+      <div>This is the onboarding!</div>
       <Outlet />
     </>
   );

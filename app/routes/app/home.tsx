@@ -1,17 +1,17 @@
 import { Website } from "@prisma/client";
 import { Link, LoaderFunction, useLoaderData } from "remix";
 import { db } from "~/utils/db.server";
-import { requireUserId } from "~/utils/session.server";
+import { requireCurrentUser } from "~/utils/session.server";
 
 type LoaderData = {
   websites: Website[];
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const userId = await requireUserId(request);
+  const user = await requireCurrentUser(request);
 
   const websites = await db.website.findMany({
-    where: { createdById: userId },
+    where: { orgId: user.orgs[0].orgId },
   });
 
   return {

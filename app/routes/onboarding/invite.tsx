@@ -20,7 +20,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   
   const user = await requireCurrentUser(request);
   const subscription = await db.subscription.findFirst({
-    where: { orgId: user.orgs[0].orgId, createdById: user.id },
+    where: { orgId: user.currentOrg.id, createdById: user.id },
     include: { plan: true },
   });
 

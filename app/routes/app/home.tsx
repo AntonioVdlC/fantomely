@@ -11,7 +11,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const user = await requireCurrentUser(request);
 
   const websites = await db.website.findMany({
-    where: { orgId: user.orgs[0].orgId },
+    where: { orgId: user.currentOrg.id },
   });
 
   return {

@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { db } from "~/utils/db.server";
 import log from "~/utils/log.server";
 
-import type { User } from "@prisma/client";
+import type { Org, User } from "@prisma/client";
 
 type RegisterForm = {
   email: string;
@@ -149,15 +149,28 @@ export async function requireCurrentUser(
 
   try {
     const userId = await requireUserId(request, redirectTo);
+    const orgId = await requireOrgId(request, redirectTo);
+
     const user = await db.user.findUnique({
       where: { id: userId },
       include: { orgs: { include: { org: true } } },
     });
+    const currentOrg = await db.org.findUnique({ where: { id: orgId } });
+    const currentUserOrg = await db.userOrg.findFirst({
+      where: { userId, orgId },
+    });
+
+    if (!currentOrg || !currentUserOrg) {
+      throw new Error("Org not found.");
+    }
     if (!user) {
       throw new Error("User not found.");
     }
 
-    return user;
+    return {
+      ...user,
+      currentOrg: { ...currentOrg, role: currentUserOrg.role },
+    };
   } catch {
     const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
 
@@ -167,6 +180,23 @@ export async function requireCurrentUser(
       },
     });
   }
+}
+
+export async function requireOrgId(
+  request: Request,
+  redirectTo: string = new URL(request.url).pathname
+) {
+  const session = await getUserSession(request);
+  const orgId = session.get("orgId");
+  if (!orgId || typeof orgId !== "string") {
+    const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
+    throw redirect(`/auth/login?${searchParams}`, {
+      headers: {
+        "Set-Cookie": await storage.destroySession(session),
+      },
+    });
+  }
+  return orgId;
 }
 
 export async function requireValidSession(
@@ -197,6 +227,16 @@ export async function requireValidSession(
 export async function createUserSession(user: User, redirectTo: string) {
   const session = await storage.getSession();
   session.set("userId", user.id);
+  return redirect(redirectTo, {
+    headers: {
+      "Set-Cookie": await storage.commitSession(session),
+    },
+  });
+}
+
+export async function setCurrentOrg(org: Org, redirectTo: string) {
+  const session = await storage.getSession();
+  session.set("orgId", org.id);
   return redirect(redirectTo, {
     headers: {
       "Set-Cookie": await storage.commitSession(session),

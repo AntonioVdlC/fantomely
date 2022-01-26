@@ -17,7 +17,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const user = await requireCurrentUser(request);
   const website = await db.website.findFirst({
-    where: { id: websiteId, orgId: user.orgs[0].orgId },
+    where: { id: websiteId, orgId: user.currentOrg.id },
   });
   if (!website) {
     throw new Response("Website not found", { status: 404 });

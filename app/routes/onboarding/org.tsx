@@ -7,6 +7,7 @@ import {
   getUser,
   requireCurrentUser,
   requireUserId,
+  setCurrentOrg,
 } from "~/utils/session.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -94,13 +95,13 @@ export const action: ActionFunction = async ({ request }) => {
         createdById: user.id,
       },
     });
+
+    return setCurrentOrg(org, "/onboarding/plan");
   } catch {
     throw new Response("Something went wrong trying to onboard user.", {
       status: 500,
     });
   }
-
-  return redirect("/onboarding/plan");
 };
 
 export default function OnboardingOrgCreationRoute() {

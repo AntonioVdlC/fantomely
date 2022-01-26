@@ -55,7 +55,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   // Check URL not created in this account yet
   const existingWebsite = await db.website.findFirst({
-    where: { url: origin, createdById: user.id, orgId: user.orgs[0].orgId },
+    where: { url: origin, createdById: user.id, orgId: user.currentOrg.id },
   });
   if (existingWebsite) {
     return redirect(`/app/website/edit/${existingWebsite.id}`);
@@ -72,7 +72,7 @@ export const action: ActionFunction = async ({ request }) => {
       url: origin,
       publicKey,
       createdById: user.id,
-      orgId: user.orgs[0].orgId,
+      orgId: user.currentOrg.id,
     },
   });
 

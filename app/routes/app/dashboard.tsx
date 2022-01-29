@@ -13,6 +13,12 @@ import { requireCurrentUser } from "~/utils/session.server";
 import LineChart from "~/components/LineChart.client";
 import { useEffect, useState } from "react";
 
+type DashboardElement = {
+  id: string;
+  value: string | number;
+  count: number;
+};
+
 type LoaderData = {
   website: Website;
   events: (Event & {
@@ -28,10 +34,18 @@ type LoaderData = {
   platforms: DashboardElement[];
 };
 
+type ElementKey = "path" | "browser" | "platform" | undefined;
+
 export const loader: LoaderFunction = async ({ request }) => {
   const { searchParams } = new URL(request.url);
   const websiteId = searchParams.get("w");
-  const el = searchParams.get("el");
+  const el: ElementKey =
+    searchParams.get("el") &&
+    ["path", "browser", "platform"].includes(
+      searchParams.get("el")?.toString() ?? ""
+    )
+      ? (searchParams.get("el") as ElementKey)
+      : undefined;
   const elId = searchParams.get("elId");
 
   if (!websiteId) {
@@ -57,7 +71,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   });
 
   let element;
-  if (el && ["path"].includes(el) && elId) {
+  if (el && ["path", "browser", "platform"].includes(el) && elId) {
     const event = events.find((event) => Boolean(event[el]));
     if (event) {
       element = event[el];
@@ -65,7 +79,11 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 
   const paths: DashboardElement[] = [];
-  const periods: DashboardElement[] = [];
+  const periods: (DashboardElement & {
+    year: number;
+    month: number;
+    day: number;
+  })[] = [];
   const browsers: DashboardElement[] = [];
   const platforms: DashboardElement[] = [];
   events.forEach((event) => {
@@ -80,18 +98,25 @@ export const loader: LoaderFunction = async ({ request }) => {
       });
     }
 
-    const period = periods.find((period) => period.id === event.periodId);
+    const period = periods.find(
+      (period) =>
+        period.year === event.period.year &&
+        period.month === event.period.month &&
+        period.day === event.period.day
+    );
     if (period) {
       period.count += event.count;
     } else {
       periods.push({
         id: event.periodId,
-        value: new Date(
+        value: Date.UTC(
           event.period.year,
           event.period.month - 1,
-          event.period.day,
-          event.period.hour
-        ).toString(),
+          event.period.day
+        ),
+        year: event.period.year,
+        month: event.period.month,
+        day: event.period.day,
         count: event.count,
       });
     }
@@ -127,20 +152,27 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
   });
 
-  return { website, events, element, paths, periods, platforms, browsers };
-};
-
-type DashboardElement = {
-  id: string;
-  value: string;
-  count: number;
+  return {
+    website,
+    events,
+    element,
+    paths,
+    periods: periods.map((period) => ({
+      id: period.id,
+      value: period.value,
+      count: period.count,
+    })),
+    platforms,
+    browsers,
+  };
 };
 
 export default function DashboardRoute() {
   const data = useLoaderData<LoaderData>();
 
-  const [isMounted, setMounted] = useState(false);
+  console.log(data.periods);
 
+  const [isMounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
   return (
@@ -167,7 +199,7 @@ export default function DashboardRoute() {
       <ul>
         {data.periods.map((period) => (
           <li key={period.id}>
-            {period.value} | {period.count}
+            {new Date(period.value).toString()} | {period.count}
           </li>
         ))}
       </ul>

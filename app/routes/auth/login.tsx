@@ -98,7 +98,7 @@ export default function Login() {
           <input
             type="hidden"
             name="redirectTo"
-            value={searchParams.get("redirectTo") ?? undefined}
+            value={searchParams.get("redirectTo") ?? ""}
           />
           <div>
             <label htmlFor="email-input">Email</label>

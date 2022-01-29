@@ -113,27 +113,83 @@ model MagicLink {
 }
 
 model Website {
-  id            String   @id @default(uuid())
+  id            String     @id @default(uuid())
   url           String
-  publicKey     String   @unique
-  events        Event[]
+  publicKey     String     @unique
   orgId         String
-  org           Org      @relation(fields: [orgId], references: [id])
+  org           Org        @relation(fields: [orgId], references: [id])
+  periods       Period[]
+  events        Event[]
+  paths         Path[]
+  browsers      Browser[]
+  platforms     Platform[]
   createdById   String
-  createdByUser User     @relation(fields: [createdById], references: [id])
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdByUser User       @relation(fields: [createdById], references: [id])
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 
   @@unique([url, createdById])
 }
 
-model Event {
-  id        String    @id @default(uuid())
-  type      EventType @default(PAGEVIEW)
+model Path {
+  id        String   @id @default(uuid())
+  value     String
   websiteId String
-  website   Website   @relation(fields: [websiteId], references: [id])
-  path      String
-  createdAt DateTime  @default(now())
+  website   Website  @relation(fields: [websiteId], references: [id])
+  events    Event[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Browser {
+  id        String   @id @default(uuid())
+  value     String
+  websiteId String
+  website   Website  @relation(fields: [websiteId], references: [id])
+  events    Event[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Platform {
+  id        String   @id @default(uuid())
+  value     String
+  websiteId String
+  website   Website  @relation(fields: [websiteId], references: [id])
+  events    Event[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Event {
+  id         String    @id @default(uuid())
+  type       EventType @default(PAGEVIEW)
+  count      Int
+  websiteId  String
+  website    Website   @relation(fields: [websiteId], references: [id])
+  periodId   String
+  period     Period    @relation(fields: [periodId], references: [id])
+  pathId     String
+  path       Path      @relation(fields: [pathId], references: [id])
+  browserId  String?
+  browser    Browser?  @relation(fields: [browserId], references: [id])
+  platformId String?
+  platform   Platform? @relation(fields: [platformId], references: [id])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Period {
+  id        String   @id @default(uuid())
+  year      Int
+  month     Int
+  day       Int
+  hour      Int
+  websiteId String
+  website   Website  @relation(fields: [websiteId], references: [id])
+  events    Event[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum EventType {

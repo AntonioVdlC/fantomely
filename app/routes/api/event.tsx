@@ -13,7 +13,7 @@ export const action: ActionFunction = async ({ request }) => {
   const now = new Date();
   const year = now.getUTCFullYear();
   const month = now.getUTCMonth() + 1;
-  const day = now.getUTCDay();
+  const day = now.getUTCDate();
   const hour = now.getUTCHours();
 
   const origin = request.headers.get("Origin");

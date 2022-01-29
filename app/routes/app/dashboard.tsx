@@ -6,7 +6,7 @@ import {
   Platform,
   Website,
 } from "@prisma/client";
-import { LoaderFunction, redirect, useLoaderData } from "remix";
+import { Link, LoaderFunction, redirect, useLoaderData } from "remix";
 import { db } from "~/utils/db.server";
 import { requireCurrentUser } from "~/utils/session.server";
 
@@ -21,7 +21,10 @@ type LoaderData = {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const websiteId = new URL(request.url).searchParams.get("w");
+  const { searchParams } = new URL(request.url);
+  const websiteId = searchParams.get("w");
+  const el = searchParams.get("el");
+  const elId = searchParams.get("elId");
 
   if (!websiteId) {
     return redirect("/app/home");
@@ -35,12 +38,25 @@ export const loader: LoaderFunction = async ({ request }) => {
     throw new Response("Website not found", { status: 404 });
   }
 
+  let where = { websiteId: website.id };
+  if (el && ["path"].includes(el) && elId) {
+    where = { ...where, [`${el}Id`]: elId };
+  }
+
   const events = await db.event.findMany({
-    where: { websiteId: website.id },
+    where,
     include: { path: true, period: true, browser: true, platform: true },
   });
 
-  return { website, events };
+  let element;
+  if (el && ["path"].includes(el) && elId) {
+    const event = events.find((event) => Boolean(event[el]));
+    if (event) {
+      element = event[el];
+    }
+  }
+
+  return { website, events, element };
 };
 
 type DashboardElement = {
@@ -53,6 +69,7 @@ export default function DashboardRoute() {
   const data = useLoaderData<LoaderData>();
 
   const paths: DashboardElement[] = [];
+  const periods: DashboardElement[] = [];
   const browsers: DashboardElement[] = [];
   const platforms: DashboardElement[] = [];
   data.events.forEach((event) => {
@@ -63,6 +80,22 @@ export default function DashboardRoute() {
       paths.push({
         id: event.pathId,
         value: event.path.value,
+        count: event.count,
+      });
+    }
+
+    const period = periods.find((period) => period.id === event.periodId);
+    if (period) {
+      period.count += event.count;
+    } else {
+      periods.push({
+        id: event.periodId,
+        value: new Date(
+          event.period.year,
+          event.period.month - 1,
+          event.period.day,
+          event.period.hour
+        ).toString(),
         count: event.count,
       });
     }
@@ -105,15 +138,26 @@ export default function DashboardRoute() {
       {data.website.url}
 
       <p>
-        Total page views:{" "}
+        Total page views for {data.element?.value}:{" "}
         {data.events.reduce((total, event) => (total += event.count), 0)}
       </p>
+
+      <p>Periods:</p>
+      <ul>
+        {periods.map((period) => (
+          <li key={period.id}>
+            {period.value} | {period.count}
+          </li>
+        ))}
+      </ul>
 
       <p>Paths:</p>
       <ul>
         {paths.map((path) => (
           <li key={path.id}>
-            {path.value} | {path.count}
+            <Link to={`/app/dashboard/w/${data.website.id}/path/${path.id}`}>
+              {path.value} | {path.count}
+            </Link>
           </li>
         ))}
       </ul>

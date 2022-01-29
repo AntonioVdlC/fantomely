@@ -10,6 +10,9 @@ import { Link, LoaderFunction, redirect, useLoaderData } from "remix";
 import { db } from "~/utils/db.server";
 import { requireCurrentUser } from "~/utils/session.server";
 
+import LineChart from "~/components/LineChart.client";
+import { useEffect, useState } from "react";
+
 type LoaderData = {
   website: Website;
   events: (Event & {
@@ -18,6 +21,11 @@ type LoaderData = {
     browser?: Browser;
     platform?: Platform;
   })[];
+  element: Path | Browser | Platform | undefined;
+  paths: DashboardElement[];
+  periods: DashboardElement[];
+  browsers: DashboardElement[];
+  platforms: DashboardElement[];
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -56,23 +64,11 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
   }
 
-  return { website, events, element };
-};
-
-type DashboardElement = {
-  id: string;
-  value: string;
-  count: number;
-};
-
-export default function DashboardRoute() {
-  const data = useLoaderData<LoaderData>();
-
   const paths: DashboardElement[] = [];
   const periods: DashboardElement[] = [];
   const browsers: DashboardElement[] = [];
   const platforms: DashboardElement[] = [];
-  data.events.forEach((event) => {
+  events.forEach((event) => {
     const path = paths.find((path) => path.id === event.pathId);
     if (path) {
       path.count += event.count;
@@ -131,6 +127,22 @@ export default function DashboardRoute() {
     }
   });
 
+  return { website, events, element, paths, periods, platforms, browsers };
+};
+
+type DashboardElement = {
+  id: string;
+  value: string;
+  count: number;
+};
+
+export default function DashboardRoute() {
+  const data = useLoaderData<LoaderData>();
+
+  const [isMounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
   return (
     <>
       <p>Dashboard</p>
@@ -142,9 +154,18 @@ export default function DashboardRoute() {
         {data.events.reduce((total, event) => (total += event.count), 0)}
       </p>
 
+      {isMounted ? (
+        <LineChart
+          data={data.periods.map((period) => [
+            new Date(period.value).getTime(),
+            period.count,
+          ])}
+        />
+      ) : null}
+
       <p>Periods:</p>
       <ul>
-        {periods.map((period) => (
+        {data.periods.map((period) => (
           <li key={period.id}>
             {period.value} | {period.count}
           </li>
@@ -153,9 +174,11 @@ export default function DashboardRoute() {
 
       <p>Paths:</p>
       <ul>
-        {paths.map((path) => (
+        {data.paths.map((path) => (
           <li key={path.id}>
-            <Link to={`/app/dashboard/w/${data.website.id}/path/${path.id}`}>
+            <Link
+              to={`/app/dashboard?w=${data.website.id}&el=path&elId=${path.id}`}
+            >
               {path.value} | {path.count}
             </Link>
           </li>
@@ -164,7 +187,7 @@ export default function DashboardRoute() {
 
       <p>Browsers:</p>
       <ul>
-        {browsers.map((browser) => (
+        {data.browsers.map((browser) => (
           <li key={browser.id}>
             {browser.value} | {browser.count}
           </li>
@@ -173,7 +196,7 @@ export default function DashboardRoute() {
 
       <p>Platforms:</p>
       <ul>
-        {platforms.map((platform) => (
+        {data.platforms.map((platform) => (
           <li key={platform.id}>
             {platform.value} | {platform.count}
           </li>

@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { db } from "~/utils/db.server";
 import log from "~/utils/log.server";
 
-import type { Org, User } from "@prisma/client";
+import type { Org, User, UserOrg } from "@prisma/client";
 
 type RegisterForm = {
   email: string;
@@ -58,6 +58,7 @@ export async function register({ email, firstName, lastName }: RegisterForm) {
 export async function login({ email, token }: LoginForm) {
   const user = await db.user.findUnique({
     where: { email },
+    include: { orgs: { include: { org: true } } },
   });
 
   if (!user) {
@@ -141,6 +142,7 @@ export async function requireUserId(
   }
   return userId;
 }
+
 export async function requireCurrentUser(
   request: Request,
   redirectTo: string = new URL(request.url).pathname
@@ -213,6 +215,8 @@ export async function requireValidSession(
     if (!user) {
       throw new Error("User not found.");
     }
+
+    return user;
   } catch {
     const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
 
@@ -224,9 +228,20 @@ export async function requireValidSession(
   }
 }
 
-export async function createUserSession(user: User, redirectTo: string) {
+export async function createUserSession(
+  user: User & {
+    orgs: (UserOrg & {
+      org: Org;
+    })[];
+  },
+  redirectTo: string
+) {
   const session = await storage.getSession();
   session.set("userId", user.id);
+  if (user.orgs?.[0]?.org?.id) {
+    session.set("orgId", user.orgs[0].org.id);
+  }
+
   return redirect(redirectTo, {
     headers: {
       "Set-Cookie": await storage.commitSession(session),

@@ -19,7 +19,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   };
 };
 
-export default function HomeRoute() {
+export default function WebsitesRoute() {
   const data = useLoaderData<LoaderData>();
 
   return (

@@ -5,8 +5,7 @@ import { Role, User } from "@prisma/client";
 import { db } from "~/utils/db.server";
 import {
   getUser,
-  requireCurrentUser,
-  requireUserId,
+  requireValidSession,
   setCurrentOrg,
 } from "~/utils/session.server";
 
@@ -42,7 +41,7 @@ type ActionData = {
 const badRequest = (data: ActionData) => json(data, { status: 400 });
 
 export const action: ActionFunction = async ({ request }) => {
-  const user = await requireCurrentUser(request);
+  const user = await requireValidSession(request);
 
   const form = await request.formData();
   const action = form.get("button-action");
@@ -60,13 +59,13 @@ export const action: ActionFunction = async ({ request }) => {
           createdById: user.id,
         },
       });
+
+      return setCurrentOrg(org, "/onboarding/plan");
     } catch {
       throw new Response("Something went wrong trying to onboard user.", {
         status: 500,
       });
     }
-
-    return redirect("/onboarding/plan");
   }
 
   const name = form.get("name");

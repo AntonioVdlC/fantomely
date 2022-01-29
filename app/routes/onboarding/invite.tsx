@@ -17,7 +17,6 @@ type LoaderData = {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  
   const user = await requireCurrentUser(request);
   const subscription = await db.subscription.findFirst({
     where: { orgId: user.currentOrg.id, createdById: user.id },

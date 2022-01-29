@@ -20,7 +20,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   return { website, user, origin: new URL(request.url).origin };
 };
 
-export default function WebsiteEditRoute() {
+export default function WebsiteDetailsRoute() {
   const data = useLoaderData<LoaderData>();
 
   return (
@@ -32,7 +32,7 @@ export default function WebsiteEditRoute() {
       <p>To start tracking, please add the following line to your website:</p>
 
       <code>
-        {`<script src="${data.origin}/sdk.js?publicKey=${data.website.publicKey}"></script>`}
+        {`<script defer src="${data.origin}/sdk.js?publicKey=${data.website.publicKey}"></script>`}
       </code>
     </>
   );

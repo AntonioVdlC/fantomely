@@ -131,7 +131,7 @@ export default function WebsiteCreateRoute() {
           </p>
 
           <code>
-            {`<script src="${window?.location?.origin}/sdk.js?publicKey=${actionData?.response?.website?.publicKey}"></script>`}
+            {`<script defer src="${window?.location?.origin}/sdk.js?publicKey=${actionData?.response?.website?.publicKey}"></script>`}
           </code>
         </div>
       ) : null}

@@ -1,24 +1,18 @@
-import type { LoaderFunction, MetaFunction } from "remix";
+import type { LoaderFunction } from "remix";
 import { Link, useLoaderData } from "remix";
 
 import { getUserId } from "~/utils/session.server";
 
-export const meta: MetaFunction = () => {
-  return {
-    title: "Analytics Service",
-    description: "Some description of the analytics service",
-  };
-};
-
 type LoaderData = {
-  userId: string;
+  isUserLoggedIn: boolean;
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await getUserId(request);
-  const data = { userId };
 
-  return data;
+  return {
+    isUserLoggedIn: Boolean(userId),
+  };
 };
 
 export default function LandingScreen() {
@@ -30,7 +24,7 @@ export default function LandingScreen() {
         <h1>Analytics Service</h1>
         <nav>
           <ul>
-            {data.userId ? (
+            {data.isUserLoggedIn ? (
               <li>
                 <Link to="/app">Go to App</Link>
               </li>

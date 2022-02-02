@@ -2,23 +2,29 @@ import type { MetaFunction } from "remix";
 import { Links, LiveReload, Outlet, Meta, Scripts } from "remix";
 import { useCatch } from "remix";
 
+import styles from "./tailwind.css";
+import favicon from "./assets/favicon.png";
+
+export function links() {
+  return [
+    { rel: "stylesheet", href: styles },
+    { rel: "icon", type: "image/png", href: favicon },
+  ];
+}
+
 export const meta: MetaFunction = () => {
-  const description = `Analytics Service`;
+  const description = `Privacy-First Web Analytics`;
   return {
     description,
-    keywords: "analytics",
-    // "twitter:image": "https://remix-jokes.lol/social.png",
-    // "twitter:card": "summary_large_image",
-    // "twitter:creator": "@remix_run",
-    // "twitter:site": "@remix_run",
-    // "twitter:title": "Remix Jokes",
-    // "twitter:description": description,
+    keywords: "privacy, web analytics, analytics",
+    "og:title": "Fantomely",
+    "og:description": "Privacy-First Web Analytics",
   };
 };
 
 function Document({
   children,
-  title = `Analytics Service`,
+  title = `Fantomely | Privacy-First Web Analytics`,
 }: {
   children: React.ReactNode;
   title?: string;

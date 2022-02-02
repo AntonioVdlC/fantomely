@@ -11,10 +11,12 @@
     "email": ""
   },
   "scripts": {
-    "build": "npm run build:sdk && remix build",
+    "build": "npm run build:sdk && npm run build:css && remix build",
     "prebuild:sdk": "rm -rf ./public/sdk && mkdir ./public/sdk",
     "build:sdk": "cd ./sdk && npm run build && cd .. && cp ./sdk/dist/browser.js ./public/sdk/browser.js",
-    "dev": "npm run build:sdk && remix dev",
+    "build:css": "tailwindcss -i ./styles/tailwind.css -o ./app/tailwind.css --minify",
+    "dev": "npm run build:sdk && concurrently \"npm run dev:css\" \"remix dev\"",
+    "dev:css": "tailwindcss -i ./styles/tailwind.css -o ./app/tailwind.css --watch",
     "pre-commit": "lint-staged",
     "lint": "npm run lint:app && npm run lint:prisma && npm run lint:sdk",
     "lint:app": "eslint app/**/*.{ts,tsx}",
@@ -25,6 +27,8 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@headlessui/react": "^1.4.3",
+    "@heroicons/react": "^1.0.5",
     "@prisma/client": "^3.8.1",
     "@remix-run/react": "^1.1.1",
     "@remix-run/serve": "^1.1.1",
@@ -37,9 +41,14 @@
   },
   "devDependencies": {
     "@remix-run/dev": "^1.1.1",
+    "@tailwindcss/aspect-ratio": "^0.4.0",
+    "@tailwindcss/forms": "^0.4.0",
+    "@tailwindcss/line-clamp": "^0.3.1",
+    "@tailwindcss/typography": "^0.5.1",
     "@types/react": "^17.0.24",
     "@types/react-dom": "^17.0.9",
     "@typescript-eslint/eslint-plugin": "^5.10.2",
+    "concurrently": "^7.0.0",
     "esbuild-register": "^3.3.2",
     "eslint": "^8.8.0",
     "eslint-config-prettier": "^8.3.0",
@@ -48,6 +57,7 @@
     "lint-staged": "^12.3.3",
     "prettier": "^2.5.1",
     "prisma": "^3.8.1",
+    "tailwindcss": "^3.0.18",
     "typescript": "^4.1.2"
   },
   "engines": {

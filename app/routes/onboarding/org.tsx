@@ -44,7 +44,7 @@ export const action: ActionFunction = async ({ request }) => {
   const user = await requireValidSession(request);
 
   const form = await request.formData();
-  const action = form.get("button-action");
+  const action = form.get("_action");
 
   if (action === "skip") {
     try {
@@ -60,7 +60,7 @@ export const action: ActionFunction = async ({ request }) => {
         },
       });
 
-      return setCurrentOrg(org, "/onboarding/plan");
+      return setCurrentOrg({ user, org }, "/onboarding/plan");
     } catch {
       throw new Response("Something went wrong trying to onboard user.", {
         status: 500,
@@ -95,7 +95,7 @@ export const action: ActionFunction = async ({ request }) => {
       },
     });
 
-    return setCurrentOrg(org, "/onboarding/plan");
+    return setCurrentOrg({ user, org }, "/onboarding/plan");
   } catch {
     throw new Response("Something went wrong trying to onboard user.", {
       status: 500,
@@ -135,10 +135,10 @@ export default function OnboardingOrgCreationRoute() {
             </p>
           ) : null}
         </div>
-        <button type="submit" name="button-action" value="skip">
+        <button type="submit" name="_action" value="skip">
           Skip
         </button>
-        <button type="submit" name="button-action" value="create">
+        <button type="submit" name="_action" value="create">
           Create
         </button>
       </Form>

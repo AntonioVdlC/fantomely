@@ -63,4 +63,5 @@ async function seed() {
   );
 }
 
-seed();
+// TODO: add Stripe prices
+// seed();

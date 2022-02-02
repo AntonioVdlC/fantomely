@@ -57,7 +57,7 @@ export const action: ActionFunction = async ({ request }) => {
   const user = await requireCurrentUser(request);
 
   const form = await request.formData();
-  const action = form.get("action");
+  const action = form.get("_action");
 
   if (action === "skip") {
     await db.user.update({
@@ -110,10 +110,10 @@ export default function OnboardingInviteRoute() {
           name="invites"
           defaultValue={actionData?.fields?.invites}
         ></textarea>
-        <button type="submit" name="action" value="skip">
+        <button type="submit" name="_action" value="skip">
           Skip
         </button>
-        <button type="submit" name="action" value="create">
+        <button type="submit" name="_action" value="create">
           Create
         </button>
       </Form>

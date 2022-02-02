@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { db } from "~/utils/db.server";
 import log from "~/utils/log.server";
 
-import type { Org, User, UserOrg } from "@prisma/client";
+import type { AdminSession, Org, User, UserOrg } from "@prisma/client";
 
 type RegisterForm = {
   email: string;
@@ -11,10 +11,18 @@ type RegisterForm = {
   lastName: string;
 };
 
+type JoinWaitlistForm = {
+  email: string;
+};
+
 type LoginForm = {
   email: string;
   token: string;
 };
+
+export function generateRandomString(size = 32) {
+  return crypto.randomBytes(32).toString("hex");
+}
 
 export async function generateMagicLink(email: string) {
   const user = await db.user.findUnique({
@@ -25,7 +33,7 @@ export async function generateMagicLink(email: string) {
     return null;
   }
 
-  const token = crypto.randomBytes(32).toString("hex");
+  const token = generateRandomString(32);
   const validUntil = new Date(Date.now() + 15 * 60 * 1000); // in 15 minutes
 
   const magicLink = await db.magicLink.create({
@@ -51,6 +59,39 @@ export async function register({ email, firstName, lastName }: RegisterForm) {
       lastName,
     },
   });
+
+  return user;
+}
+
+export async function joinWaitlist({ email }: JoinWaitlistForm) {
+  const userExists = await db.user.findFirst({
+    where: { email },
+  });
+  if (userExists) {
+    return null;
+  }
+
+  // Create user
+  const user = await db.user.create({
+    data: {
+      email,
+      isBeta: true,
+      isInWaitlist: true,
+    },
+  });
+
+  return user;
+}
+
+export async function loginWaitlist({ email, token }: LoginForm) {
+  const user = await db.user.findFirst({
+    where: { email, waitlistToken: token, isInWaitlist: true },
+    include: { orgs: { include: { org: true } } },
+  });
+
+  if (!user) {
+    return null;
+  }
 
   return user;
 }
@@ -115,8 +156,24 @@ const storage = createCookieSessionStorage({
   },
 });
 
+const adminStorage = createCookieSessionStorage({
+  cookie: {
+    name: "analytics-service_admin-session",
+    secure: process.env.NODE_ENV === "production",
+    secrets: [sessionSecret],
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 30,
+    httpOnly: true,
+  },
+});
+
 export function getUserSession(request: Request) {
   return storage.getSession(request.headers.get("Cookie"));
+}
+
+export function getAdminSession(request: Request) {
+  return adminStorage.getSession(request.headers.get("Cookie"));
 }
 
 export async function getUserId(request: Request) {
@@ -249,9 +306,19 @@ export async function createUserSession(
   });
 }
 
-export async function setCurrentOrg(org: Org, redirectTo: string) {
+type SetCurrentOrgData = {
+  user: User;
+  org: Org;
+};
+
+export async function setCurrentOrg(
+  { user, org }: SetCurrentOrgData,
+  redirectTo: string
+) {
   const session = await storage.getSession();
+  session.set("userId", user.id);
   session.set("orgId", org.id);
+
   return redirect(redirectTo, {
     headers: {
       "Set-Cookie": await storage.commitSession(session),
@@ -280,6 +347,51 @@ export async function logout(request: Request) {
   return redirect("/auth/logout/callback", {
     headers: {
       "Set-Cookie": await storage.destroySession(session),
+    },
+  });
+}
+
+export async function logoutAdmin(request: Request) {
+  const session = await adminStorage.getSession(request.headers.get("Cookie"));
+  return redirect("/auth/logout/callback", {
+    headers: {
+      "Set-Cookie": await adminStorage.destroySession(session),
+    },
+  });
+}
+
+export async function requireAdminSession(request: Request) {
+  const session = await getAdminSession(request);
+
+  const token = session.get("adminSessionToken");
+  if (!token || typeof token !== "string") {
+    throw redirect(`/admin/login`, {
+      headers: {
+        "Set-Cookie": await adminStorage.destroySession(session),
+      },
+    });
+  }
+
+  const validUntil = new Date(session.get("adminSessionValidUntil"));
+  if (validUntil < new Date()) {
+    throw redirect(`/admin/login`, {
+      headers: {
+        "Set-Cookie": await adminStorage.destroySession(session),
+      },
+    });
+  }
+
+  return { token };
+}
+
+export async function createAdminSession(adminSession: AdminSession) {
+  const session = await adminStorage.getSession();
+  session.set("adminSessionToken", adminSession.token);
+  session.set("adminSessionValidUntil", adminSession.validUntil.toISOString());
+
+  return redirect("/admin/dashboard", {
+    headers: {
+      "Set-Cookie": await adminStorage.commitSession(session),
     },
   });
 }

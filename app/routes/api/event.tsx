@@ -19,6 +19,8 @@ export const action: ActionFunction = async ({ request }) => {
   const origin = request.headers.get("Origin");
   const payload = await request.json();
 
+  console.log("==== event", payload)
+
   const useragent = parseClientHints(request);
 
   // Website
@@ -32,11 +34,11 @@ export const action: ActionFunction = async ({ request }) => {
     });
   }
 
-  console.dir(website)
+  console.dir(website);
 
   // Path
-  let path = await db.path.findFirst({
-    where: { value: payload[KEYS.PATH], websiteId: website.id },
+  let path = await db.path.findUnique({
+    where: { path: { value: payload[KEYS.PATH], websiteId: website.id } },
   });
   if (!path) {
     path = await db.path.create({
@@ -47,10 +49,10 @@ export const action: ActionFunction = async ({ request }) => {
     });
   }
 
-  console.dir(path)
+  console.dir(path);
   // Browser
-  let browser = await db.browser.findFirst({
-    where: { value: useragent.browser, websiteId: website.id },
+  let browser = await db.browser.findUnique({
+    where: { browser: { value: useragent.browser, websiteId: website.id } },
   });
   if (!browser) {
     browser = await db.browser.create({
@@ -61,10 +63,10 @@ export const action: ActionFunction = async ({ request }) => {
     });
   }
 
-  console.dir(browser)
+  console.dir(browser);
   // Platform
-  let platform = await db.platform.findFirst({
-    where: { value: useragent.platform, websiteId: website.id },
+  let platform = await db.platform.findUnique({
+    where: { platform: { value: useragent.platform, websiteId: website.id } },
   });
   if (!platform) {
     platform = await db.platform.create({
@@ -75,15 +77,17 @@ export const action: ActionFunction = async ({ request }) => {
     });
   }
 
-  console.dir(platform)
+  console.dir(platform);
   // Find period
-  let period = await db.period.findFirst({
+  let period = await db.period.findUnique({
     where: {
-      websiteId: website.id,
-      year,
-      month,
-      day,
-      hour,
+      period_website: {
+        year,
+        month,
+        day,
+        hour,
+        websiteId: website.id,
+      },
     },
   });
   if (!period) {
@@ -98,36 +102,31 @@ export const action: ActionFunction = async ({ request }) => {
     });
   }
 
-  console.dir(period)
+  console.dir(period);
   // Find event
-  let event = await db.event.findFirst({
+  const event = await db.event.upsert({
     where: {
-      websiteId: website.id,
-      periodId: period.id,
-      pathId: path.id,
-      browserId: browser.id || null,
-      platformId: platform.id || null,
-    },
-  });
-  if (!event) {
-    event = await db.event.create({
-      data: {
+      website_period_path: {
         websiteId: website.id,
         periodId: period.id,
         pathId: path.id,
-        browserId: browser.id || null,
-        platformId: platform.id || null,
-        count: 0,
+        browserId: browser.id || "",
+        platformId: platform.id || "",
       },
-    });
-  }
-  console.dir(event)
-
-  // Save event in database
-  await db.event.update({
-    data: { count: event.count + 1 },
-    where: { id: event.id },
+    },
+    create: {
+      websiteId: website.id,
+      periodId: period.id,
+      pathId: path.id,
+      browserId: browser.id || "",
+      platformId: platform.id || "",
+      count: 1,
+    },
+    update: {
+      count: { increment: 1 },
+    },
   });
+  console.dir(event);
 
   return new Response("ok", {
     headers: {

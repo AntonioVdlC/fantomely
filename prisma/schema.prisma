@@ -12,8 +12,8 @@ datasource db {
 
 model User {
   id                   String         @id @default(uuid())
-  firstName            String
-  lastName             String
+  firstName            String?
+  lastName             String?
   email                String         @unique
   sessions             MagicLink[]
   websites             Website[]
@@ -21,6 +21,11 @@ model User {
   createdSubscriptions Subscription[]
   createdOrgs          Org[]
   createdUserOrgs      UserOrg[]      @relation("creator")
+  isBeta               Boolean        @default(false)
+  isInWaitlist         Boolean        @default(false)
+  waitlistToken        String?
+  waitlistInviteSent   Boolean?
+  waitlistInviteSentAt DateTime?
   isOnboarded          Boolean        @default(false)
   isActive             Boolean        @default(true)
   createdAt            DateTime       @default(now())
@@ -128,7 +133,7 @@ model Website {
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
-  @@unique([url, createdById])
+  @@unique(fields: [url, createdById], name: "website")
 }
 
 model Path {
@@ -139,6 +144,8 @@ model Path {
   events    Event[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique(fields: [value, websiteId], name: "path")
 }
 
 model Browser {
@@ -149,6 +156,8 @@ model Browser {
   events    Event[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique(fields: [value, websiteId], name: "browser")
 }
 
 model Platform {
@@ -159,6 +168,8 @@ model Platform {
   events    Event[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique(fields: [value, websiteId], name: "platform")
 }
 
 model Event {
@@ -177,6 +188,8 @@ model Event {
   platform   Platform? @relation(fields: [platformId], references: [id])
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
+
+  @@unique(fields: [websiteId, periodId, pathId, browserId, platformId], name: "website_period_path")
 }
 
 model Period {
@@ -190,8 +203,27 @@ model Period {
   events    Event[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique(fields: [year, month, day, hour, websiteId], name: "period_website")
 }
 
 enum EventType {
   PAGEVIEW
+}
+
+model AdminToken {
+  id         String   @id @default(uuid())
+  value      String
+  validUntil DateTime
+  isUsed     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model AdminSession {
+  id         String   @id @default(uuid())
+  token      String
+  validUntil DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

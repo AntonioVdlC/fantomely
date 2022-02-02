@@ -3,6 +3,7 @@ import ReactApexChart from "react-apexcharts";
 export default function LineChart({ data }: { data: number[][] }) {
   const series = [
     {
+      name: "Page Views",
       data,
     },
   ];
@@ -45,6 +46,11 @@ export default function LineChart({ data }: { data: number[][] }) {
     tooltip: {
       x: {
         format: "dd MMM yyyy",
+      },
+      y: {
+        formatter: function (val: number) {
+          return val.toFixed(0);
+        },
       },
     },
     fill: {

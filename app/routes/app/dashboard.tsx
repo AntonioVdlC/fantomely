@@ -10,7 +10,7 @@ import { Link, LoaderFunction, redirect, useLoaderData } from "remix";
 import { db } from "~/utils/db.server";
 import { requireCurrentUser } from "~/utils/session.server";
 
-import LineChart from "~/components/LineChart.client";
+import BrushChart from "~/components/BrushChart.client";
 import { useEffect, useState } from "react";
 
 type DashboardElement = {
@@ -68,6 +68,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const events = await db.event.findMany({
     where,
     include: { path: true, period: true, browser: true, platform: true },
+    orderBy: { period: { createdAt: "asc" } },
   });
 
   let element;
@@ -186,8 +187,8 @@ export default function DashboardRoute() {
         {data.events.reduce((total, event) => (total += event.count), 0)}
       </p>
 
-      {isMounted ? (
-        <LineChart
+      {isMounted && data.periods.length ? (
+        <BrushChart
           data={data.periods.map((period) => [
             new Date(period.value).getTime(),
             period.count,

@@ -1,41 +1,26 @@
-import type { ActionFunction, LoaderFunction, MetaFunction } from "remix";
-import {
-  Form,
-  useActionData,
-  redirect,
-  json,
-  useSearchParams,
-  Link,
-} from "remix";
+import type { ActionFunction, LoaderFunction } from "remix";
+import { Form, json, redirect, useActionData } from "remix";
 
+import { Role, User } from "@prisma/client";
 import { db } from "~/utils/db.server";
-import { isValidEmail } from "~/utils/is-valid";
-import { generateMagicLink, getUserId, register } from "~/utils/session.server";
-
-export const meta: MetaFunction = () => {
-  return {
-    title: "Analytics Service | Register",
-    description: "Register to Analytics Service!",
-  };
-};
+import {
+  getUser,
+  requireValidSession,
+  setCurrentOrg,
+} from "~/utils/session.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const userId = await getUserId(request);
+  const user = await getUser(request);
+  if (!user) {
+    throw new Response("Unauthorized", { status: 401 });
+  }
 
-  if (userId) {
-    // Redirect to the home page if they are already signed in.
+  if (user.isOnboarded) {
     return redirect("/app");
   }
 
-  // TODO: remove this redirect when not in private beta
-  return redirect("/auth/waitlist");
+  return {};
 };
-
-function validateEmail(email: unknown) {
-  if (typeof email !== "string" || !isValidEmail(email)) {
-    return `The email is invalid`;
-  }
-}
 
 function validateFirstName(firstName: unknown) {
   if (typeof firstName !== "string" || firstName.length < 1) {
@@ -52,12 +37,10 @@ function validateLastName(lastName: unknown) {
 type ActionData = {
   formError?: string;
   fieldErrors?: {
-    email: string | undefined;
     firstName: string | undefined;
     lastName: string | undefined;
   };
   fields?: {
-    email: string;
     firstName: string;
     lastName: string;
   };
@@ -66,23 +49,19 @@ type ActionData = {
 const badRequest = (data: ActionData) => json(data, { status: 400 });
 
 export const action: ActionFunction = async ({ request }) => {
+  const user = await requireValidSession(request);
   const form = await request.formData();
-  const email = form.get("email");
+
   const firstName = form.get("first-name");
   const lastName = form.get("last-name");
-  if (
-    typeof email !== "string" ||
-    typeof firstName !== "string" ||
-    typeof lastName !== "string"
-  ) {
+  if (typeof firstName !== "string" || typeof lastName !== "string") {
     return badRequest({
       formError: `Form not submitted correctly.`,
     });
   }
 
-  const fields = { email, firstName, lastName };
+  const fields = { firstName, lastName };
   const fieldErrors = {
-    email: validateEmail(email),
     firstName: validateFirstName(firstName),
     lastName: validateLastName(lastName),
   };
@@ -90,73 +69,47 @@ export const action: ActionFunction = async ({ request }) => {
     return badRequest({ fieldErrors, fields });
   }
 
-  const userExists = await db.user.findFirst({
-    where: { email },
-  });
-  if (userExists) {
-    return badRequest({
-      fields,
-      formError: `User already exists`,
+  try {
+    const org = await db.org.create({
+      data: { name: `${user.firstName}'s org`, createdById: user.id },
+    });
+    await db.userOrg.create({
+      data: {
+        userId: user.id,
+        orgId: org.id,
+        role: Role.OWNER,
+        createdById: user.id,
+      },
+    });
+
+    await db.user.update({
+      data: { firstName, lastName, isInWaitlist: false, isOnboarded: true },
+      where: { id: user.id },
+    });
+
+    return setCurrentOrg({ user, org }, "/app");
+  } catch {
+    throw new Response("Something went wrong trying to onboard user.", {
+      status: 500,
     });
   }
-  const user = await register({ email, firstName, lastName });
-  if (!user) {
-    return badRequest({
-      fields,
-      formError: `User already exists`,
-    });
-  }
-
-  const magicLink = await generateMagicLink(email);
-  if (!magicLink) {
-    return badRequest({
-      fields,
-      formError: `Unable to find a user with that email.`,
-    });
-  }
-
-  // TODO: send email
-  console.log(
-    `/auth/login/callback?email=${email}&token=${magicLink.token}&from=register`
-  );
-
-  return redirect(`/auth/login/sent?email=${email}&from=register`);
 };
 
-export default function RegisterRoute() {
+export default function OnboardingOrgCreationRoute() {
   const actionData = useActionData<ActionData>();
-  const [searchParams] = useSearchParams();
 
   return (
-    <div>
+    <>
+      <p>Welcome to the private beta of Fantomely!</p>
+
+      <p></p>
+
       <Form
         method="post"
         aria-describedby={
           actionData?.formError ? "form-error-message" : undefined
         }
       >
-        <div>
-          <label htmlFor="email-input">Email</label>
-          <input
-            type="email"
-            id="email-input"
-            name="email"
-            defaultValue={
-              actionData?.fields?.email ||
-              searchParams.get("email") ||
-              undefined
-            }
-            aria-invalid={Boolean(actionData?.fieldErrors?.email)}
-            aria-describedby={
-              actionData?.fieldErrors?.email ? "email-error" : undefined
-            }
-          />
-          {actionData?.fieldErrors?.email ? (
-            <p className="form-validation-error" role="alert" id="email-error">
-              {actionData?.fieldErrors.email}
-            </p>
-          ) : null}
-        </div>
         <div>
           <label htmlFor="first-name-input">First Name</label>
           <input
@@ -215,16 +168,13 @@ export default function RegisterRoute() {
               <p className="form-validation-error" role="alert">
                 {actionData?.formError}
               </p>
-              <Link to={`/auth/login?email=${actionData?.fields?.email || ""}`}>
-                Sign in instead!
-              </Link>
             </>
           ) : null}
         </div>
         <button type="submit" className="button">
-          Register
+          Create account
         </button>
       </Form>
-    </div>
+    </>
   );
 }

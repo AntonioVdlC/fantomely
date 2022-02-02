@@ -1,21 +1,9 @@
 import type { ActionFunction, LoaderFunction, MetaFunction } from "remix";
-import {
-  Form,
-  useActionData,
-  redirect,
-  json,
-  useSearchParams,
-  Link,
-} from "remix";
+import { Form, useActionData, redirect, json, Link } from "remix";
 
 import { db } from "~/utils/db.server";
 import { isValidEmail } from "~/utils/is-valid";
-import {
-  generateMagicLink,
-  getUserId,
-  joinWaitlist,
-  register,
-} from "~/utils/session.server";
+import { getUserId, joinWaitlist } from "~/utils/session.server";
 
 export const meta: MetaFunction = () => {
   return {

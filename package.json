@@ -12,8 +12,8 @@
   },
   "scripts": {
     "build": "npm run build:sdk && remix build",
-    "prebuild:sdk": "rm -rf ./build/sdk && mkdir ./build/sdk",
-    "build:sdk": "cd ./sdk && npm run build && cd .. && cp ./sdk/dist/browser.js ./build/sdk/browser.js",
+    "prebuild:sdk": "rm -rf ./public/sdk && mkdir ./public/sdk",
+    "build:sdk": "cd ./sdk && npm run build && cd .. && cp ./sdk/dist/browser.js ./public/sdk/browser.js",
     "dev": "npm run build:sdk && remix dev",
     "postinstall": "remix setup node",
     "start": "remix-serve build"

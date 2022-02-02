@@ -131,7 +131,7 @@ export default function WebsiteCreateRoute() {
           </p>
 
           <code>
-            {`<script defer src="${window?.location?.origin}/sdk.js?publicKey=${actionData?.response?.website?.publicKey}"></script>`}
+            {`<script async src="${window?.location?.origin}/sdk/browser.js" data-fantomely data-h="${window?.location?.origin}" data-k="${actionData?.response?.website?.publicKey}"></script>`}
           </code>
         </div>
       ) : null}

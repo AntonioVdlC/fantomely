@@ -6,8 +6,8 @@ import { requireCurrentUser } from "~/utils/session.server";
 type LoaderData = {
   user: User & {
     orgs: (UserOrg & {
-        org: Org;
-    })[]
+      org: Org;
+    })[];
   };
   website: Website;
   origin: string;
@@ -32,7 +32,7 @@ export default function WebsiteDetailsRoute() {
       <p>To start tracking, please add the following line to your website:</p>
 
       <code>
-        {`<script defer src="${data.origin}/sdk.js?publicKey=${data.website.publicKey}"></script>`}
+        {`<script async src="${data.origin}/sdk/browser.js" data-fantomely data-h="${data.origin}" data-k="${data.website.publicKey}"></script>`}
       </code>
     </>
   );

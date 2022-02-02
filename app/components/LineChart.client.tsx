@@ -38,6 +38,10 @@ export default function LineChart({ data }: { data: number[][] }) {
         },
       },
     },
+    yaxis: {
+      min: 0,
+      max: Math.max(...data.map((d) => d[1])) + 1,
+    },
     tooltip: {
       x: {
         format: "dd MMM yyyy",

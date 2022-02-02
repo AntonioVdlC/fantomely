@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+
 import { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 

@@ -171,8 +171,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function DashboardRoute() {
   const data = useLoaderData<LoaderData>();
 
-  console.log(data.periods);
-
   const [isMounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 

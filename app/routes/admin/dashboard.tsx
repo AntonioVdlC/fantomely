@@ -3,7 +3,6 @@ import {
   ActionFunction,
   Form,
   LoaderFunction,
-  Outlet,
   redirect,
   useLoaderData,
 } from "remix";
@@ -43,7 +42,6 @@ export const action: ActionFunction = async ({ request }) => {
   switch (action) {
     case "waitlist_invite": {
       const email = form.get("email");
-      console.log(email);
       if (!email || typeof email !== "string") {
         throw new Error("No email.");
       }
@@ -67,6 +65,7 @@ export const action: ActionFunction = async ({ request }) => {
 
       // Send invite link
       // TODO
+      // eslint-disable-next-line no-console
       console.log(
         `emailto: ${user.email}`,
         `/auth/waitlist/callback?email=${user.email}&token=${waitlistToken}`

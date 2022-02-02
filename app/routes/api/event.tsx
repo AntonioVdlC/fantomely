@@ -1,5 +1,4 @@
-import { EventType, Prisma } from "@prisma/client";
-import { json, ActionFunction } from "remix";
+import type { ActionFunction } from "remix";
 import { db } from "~/utils/db.server";
 import { parseClientHints } from "~/utils/useragent.server";
 
@@ -19,8 +18,6 @@ export const action: ActionFunction = async ({ request }) => {
   const origin = request.headers.get("Origin");
   const payload = await request.json();
 
-  console.log("==== event", payload)
-
   const useragent = parseClientHints(request);
 
   // Website
@@ -33,8 +30,6 @@ export const action: ActionFunction = async ({ request }) => {
       status: 404,
     });
   }
-
-  console.dir(website);
 
   // Path
   let path = await db.path.findUnique({
@@ -49,7 +44,6 @@ export const action: ActionFunction = async ({ request }) => {
     });
   }
 
-  console.dir(path);
   // Browser
   let browser = await db.browser.findUnique({
     where: { browser: { value: useragent.browser, websiteId: website.id } },
@@ -63,7 +57,6 @@ export const action: ActionFunction = async ({ request }) => {
     });
   }
 
-  console.dir(browser);
   // Platform
   let platform = await db.platform.findUnique({
     where: { platform: { value: useragent.platform, websiteId: website.id } },
@@ -77,7 +70,6 @@ export const action: ActionFunction = async ({ request }) => {
     });
   }
 
-  console.dir(platform);
   // Find period
   let period = await db.period.findUnique({
     where: {
@@ -102,9 +94,8 @@ export const action: ActionFunction = async ({ request }) => {
     });
   }
 
-  console.dir(period);
-  // Find event
-  const event = await db.event.upsert({
+  // Upsert event
+  await db.event.upsert({
     where: {
       website_period_path: {
         websiteId: website.id,
@@ -126,7 +117,6 @@ export const action: ActionFunction = async ({ request }) => {
       count: { increment: 1 },
     },
   });
-  console.dir(event);
 
   return new Response("ok", {
     headers: {

@@ -26,8 +26,6 @@ export const loader: LoaderFunction = async ({ request }) => {
     throw new Response("Error trying to log in.", { status: 404 });
   }
 
-  console.log(user)
-
   if (!user.isOnboarded) {
     return createUserSession(user, "/onboarding");
   }

@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const db = new PrismaClient();
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function seed() {
   // Default Plans
   const plans = [

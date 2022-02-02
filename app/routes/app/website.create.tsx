@@ -21,7 +21,7 @@ type ActionData = {
     url: string;
   };
   response?: {
-    success: Boolean;
+    success: boolean;
     website: Website;
   };
 };

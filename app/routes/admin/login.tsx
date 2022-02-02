@@ -6,7 +6,7 @@ import {
 } from "~/utils/session.server";
 
 type ActionData = {
-  tokenSent: Boolean;
+  tokenSent: boolean;
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -24,6 +24,7 @@ export const action: ActionFunction = async ({ request }) => {
       });
 
       // TODO: send to ADMIN_EMAIL
+      // eslint-disable-next-line no-console
       console.log(`emailto: ${process.env.ADMIN_EMAIL}`, token.value);
 
       return { tokenSent: true };

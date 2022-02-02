@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+
 import ReactApexChart from "react-apexcharts";
 
 export default function LineChart({ data }: { data: number[][] }) {

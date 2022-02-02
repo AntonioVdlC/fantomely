@@ -1,4 +1,5 @@
 // TODO: Remove console logs?
+/* eslint-disable no-console */
 
 window.addEventListener("DOMContentLoaded", function () {
   const script = document.querySelector("script[data-fantomely]");

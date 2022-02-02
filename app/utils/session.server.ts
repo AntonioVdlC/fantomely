@@ -1,7 +1,6 @@
 import { createCookieSessionStorage, redirect } from "remix";
 import crypto from "crypto";
 import { db } from "~/utils/db.server";
-import log from "~/utils/log.server";
 
 import type { AdminSession, Org, User, UserOrg } from "@prisma/client";
 
@@ -21,7 +20,7 @@ type LoginForm = {
 };
 
 export function generateRandomString(size = 32) {
-  return crypto.randomBytes(32).toString("hex");
+  return crypto.randomBytes(size).toString("hex");
 }
 
 export async function generateMagicLink(email: string) {

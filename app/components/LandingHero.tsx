@@ -6,9 +6,9 @@ import illustration from "~/assets/landing_illustration.svg";
 export default function LandingHero() {
   return (
     <div className="pt-10 bg-slate-50 sm:pt-16 lg:pt-8 lg:pb-14 lg:overflow-hidden">
-      <div className="mx-auto max-w-7xl lg:px-8">
-        <div className="lg:grid lg:grid-cols-2 lg:gap-8">
-          <div className="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 sm:text-center lg:px-0 lg:text-left lg:flex lg:items-center">
+      <div className="mx-auto max-w-7xl">
+        <div className="lg:grid lg:grid-cols-5 lg:gap-8">
+          <div className="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 sm:text-center lg:px-0 lg:text-left lg:flex lg:items-center lg:col-span-3">
             <div className="lg:py-24">
               <h1 className="mt-4 text-4xl tracking-tight font-extrabold text-slate-900 sm:mt-5 sm:text-6xl lg:mt-6 xl:text-6xl">
                 <span className="block">Make your analytics</span>
@@ -16,7 +16,7 @@ export default function LandingHero() {
               </h1>
               <p className="mt-3 text-base text-slate-700 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
                 Get actionable insights about your website usage without
-                vulnerating your users’ privacy by storing only aggregated data
+                vulnerating your users' privacy by storing only aggregated data
                 on an open-source platform.
               </p>
               <div className="mt-10 sm:mt-12">

@@ -39,7 +39,7 @@ export default function Header({ navigation, isUserLoggedIn }: Props) {
                 <a
                   key={item.name}
                   href={item.href}
-                  className="text-base font-medium text-slate-900 hover:text-slate-800"
+                  className="text-base font-medium text-slate-700 hover:text-slate-900"
                 >
                   {item.name}
                 </a>

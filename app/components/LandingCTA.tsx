@@ -95,6 +95,7 @@ export default function LandingCTA() {
                   id="cta-email"
                   name="email"
                   type="email"
+                  required
                   className="block w-full px-4 py-3 rounded-md border-0 text-base text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-300 focus:ring-offset-slate-900"
                   placeholder="Enter your email"
                 />

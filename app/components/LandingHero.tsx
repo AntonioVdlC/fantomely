@@ -34,6 +34,7 @@ export default function LandingHero() {
                         id="email"
                         type="email"
                         name="email"
+                        required
                         placeholder="Enter your email"
                         className="block w-full px-4 py-3 rounded-md border-0 text-base text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-300 focus:ring-offset-slate-900"
                       />

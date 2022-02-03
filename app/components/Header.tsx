@@ -26,7 +26,7 @@ export default function Header({ navigation, isUserLoggedIn }: Props) {
         >
           <div className="flex items-center flex-1">
             <div className="flex items-center justify-between w-full md:w-auto">
-              <Logo withText />
+              <Logo withText withLink />
               <div className="-mr-2 flex items-center md:hidden">
                 <Popover.Button className="bg-slate-100 rounded-md p-2 inline-flex items-center justify-center text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus-ring-inset focus:ring-white">
                   <span className="sr-only">Open main menu</span>
@@ -36,13 +36,13 @@ export default function Header({ navigation, isUserLoggedIn }: Props) {
             </div>
             <div className="hidden space-x-8 md:flex md:ml-10">
               {navigation.map((item) => (
-                <a
+                <Link
+                  to={item.href}
                   key={item.name}
-                  href={item.href}
                   className="text-base font-medium text-slate-700 hover:text-slate-900"
                 >
                   {item.name}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -83,7 +83,7 @@ export default function Header({ navigation, isUserLoggedIn }: Props) {
           <div className="rounded-lg shadow-md bg-slate-100 ring-1 ring-slate-300 ring-opacity-5 overflow-hidden">
             <div className="px-5 pt-4 flex items-center justify-between">
               <div>
-                <Logo />
+                <Logo withText withLink />
               </div>
               <div className="-mr-2">
                 <Popover.Button className="bg-slate-100 rounded-md p-2 inline-flex items-center justify-center text-slate-900 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-slate-300">

@@ -1,5 +1,7 @@
-import type { LoaderFunction } from "remix";
+import { LoaderFunction, useCatch } from "remix";
 import { redirect } from "remix";
+import ErrorPage from "~/components/ErrorPage";
+import Loading from "~/components/Loading";
 
 import { createUserSession, getUserId, login } from "~/utils/session.server";
 
@@ -17,13 +19,20 @@ export const loader: LoaderFunction = async ({ request }) => {
   const redirectTo = url.searchParams.get("redirectTo") || "/app";
 
   if (!email || !token) {
-    throw new Response("Error trying to log in.", { status: 400 });
+    throw new Response("Oops, we're missing some critical info!", {
+      status: 400,
+      statusText: "An email or token is missing.",
+    });
   }
 
   const user = await login({ email, token });
 
   if (!user) {
-    throw new Response("Error trying to log in.", { status: 404 });
+    throw new Response("Oops, we can't find you ...", {
+      status: 404,
+      statusText:
+        "We couldn't find your account. The magic link has most likely expired.",
+    });
   }
 
   if (!user.isOnboarded) {
@@ -36,7 +45,26 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function LoginCallbackRoute() {
   return (
     <>
-      <p>Signing you in ...</p>
+      <Loading text="Signing you in ..." />
     </>
+  );
+}
+
+export function CatchBoundary() {
+  const caught = useCatch();
+
+  const title = caught.data;
+  const description = caught.statusText;
+
+  return (
+    <ErrorPage
+      status={caught.status}
+      title={title}
+      description={description}
+      goToLink={{
+        text: "Sign in again",
+        href: "/auth/login",
+      }}
+    />
   );
 }

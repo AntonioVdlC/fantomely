@@ -50,7 +50,9 @@ export default function LandingScreen() {
       { name: "About", href: "/about" },
       { name: "Docs", href: "/docs" },
       { name: "Pricing", href: "/pricing" },
+      { name: "Status", href: "/status" },
       { name: "Terms", href: "/terms" },
+      { name: "Licence", href: "/licence" },
     ],
     social: [
       {
@@ -90,7 +92,7 @@ export default function LandingScreen() {
       Icon: ScaleIcon,
     },
     {
-      name: "Powerful Analytics",
+      name: "Powerful analytics",
       description:
         "We provide meaningful analytics while protecting your users' privacy. Who said you can't have both?",
       Icon: PresentationChartLineIcon,

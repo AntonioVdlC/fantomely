@@ -1,18 +1,21 @@
-import { Fragment } from "react";
 import { Link } from "remix";
 
 import logo from "~/assets/logo.svg";
+import logoWhite from "~/assets/logo_white.svg";
 import logoText from "~/assets/logo_text.svg";
+import logoTextWhite from "~/assets/logo_text_white.svg";
 
 type Props = {
   withText?: boolean;
   withLink?: boolean;
-  size?: "sm" | "md" | "lg";
+  white?: boolean;
+  size?: "xs" | "sm" | "md" | "lg";
 };
 
 export default function Logo({
   withText = false,
   withLink = false,
+  white = false,
   size = "sm",
 }: Props) {
   let classSize;
@@ -24,20 +27,37 @@ export default function Logo({
       classSize = "h-12";
       break;
     case "sm":
+      classSize = "h-8 sm:h-10";
+      break;
+    case "xs":
+      classSize = "h-8";
+      break;
     default:
       classSize = "h-8 sm:h-10";
   }
 
-  const Component = withLink ? Link : Fragment;
+  let src;
+  if (withText) {
+    src = logoText;
+    if (white) {
+      src = logoTextWhite;
+    }
+  } else {
+    src = logo;
+    if (white) {
+      src = logoWhite;
+    }
+  }
 
-  return (
-    <Component to="/">
+  return withLink ? (
+    <Link to="/">
       <span className="sr-only">Fantomely</span>
-      <img
-        className={`w-auto ${classSize}`}
-        src={withText ? logoText : logo}
-        alt="Fantomely"
-      />
-    </Component>
+      <img className={`w-auto ${classSize}`} src={src} alt="Fantomely" />
+    </Link>
+  ) : (
+    <div>
+      <span className="sr-only">Fantomely</span>
+      <img className={`w-auto ${classSize}`} src={src} alt="Fantomely" />
+    </div>
   );
 }

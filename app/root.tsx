@@ -29,21 +29,19 @@ export const meta: MetaFunction = () => {
 function Document({
   children,
   title = `Fantomely | Privacy-First Web Analytics`,
-  full = false,
 }: {
   children: React.ReactNode;
   title?: string;
-  full?: boolean;
 }) {
   return (
-    <html lang="en" className={full ? "h-full" : ""}>
+    <html lang="en" className="h-full">
       <head>
         <meta charSet="utf-8" />
         <Meta />
         <title>{title}</title>
         <Links />
       </head>
-      <body className={full ? "h-full" : ""}>
+      <body className="h-full">
         {children}
         <Scripts />
         {process.env.NODE_ENV === "development" ? <LiveReload /> : null}
@@ -65,7 +63,7 @@ export function CatchBoundary() {
   const error = errors[caught.status.toString()] || defaultError;
 
   return (
-    <Document title={`${caught.status} ${caught.statusText}`} full>
+    <Document title={`${caught.status} ${caught.statusText}`}>
       <ErrorPage status={caught.status} {...error} />
     </Document>
   );

@@ -28,7 +28,7 @@ export default function Header({ navigation, isUserLoggedIn }: Props) {
             <div className="flex items-center justify-between w-full md:w-auto">
               <Logo withText withLink />
               <div className="-mr-2 flex items-center md:hidden">
-                <Popover.Button className="bg-slate-100 rounded-md p-2 inline-flex items-center justify-center text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus-ring-inset focus:ring-white">
+                <Popover.Button className="bg-slate-50 rounded-md p-2 inline-flex items-center justify-center text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus-ring-inset focus:ring-slate-300">
                   <span className="sr-only">Open main menu</span>
                   <MenuIcon className="h-6 w-6" aria-hidden="true" />
                 </Popover.Button>
@@ -48,11 +48,9 @@ export default function Header({ navigation, isUserLoggedIn }: Props) {
           </div>
           <div className="hidden md:flex md:items-center md:space-x-6">
             {isUserLoggedIn ? (
-              <div className="mt-6 px-5">
-                <Button to="/app" primary>
-                  Go to app
-                </Button>
-              </div>
+              <Button to="/app" primary>
+                Go to app
+              </Button>
             ) : (
               <>
                 <Button to="/auth/login" secondary>
@@ -80,13 +78,13 @@ export default function Header({ navigation, isUserLoggedIn }: Props) {
           focus
           className="absolute z-10 top-0 inset-x-0 p-2 transition transform origin-top md:hidden"
         >
-          <div className="rounded-lg shadow-md bg-slate-100 ring-1 ring-slate-300 ring-opacity-5 overflow-hidden">
+          <div className="rounded-lg shadow-md bg-slate-50 ring-1 ring-slate-300 ring-opacity-5 overflow-hidden">
             <div className="px-5 pt-4 flex items-center justify-between">
               <div>
                 <Logo withText withLink />
               </div>
               <div className="-mr-2">
-                <Popover.Button className="bg-slate-100 rounded-md p-2 inline-flex items-center justify-center text-slate-900 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-slate-300">
+                <Popover.Button className="bg-slate-50 rounded-md p-2 inline-flex items-center justify-center text-slate-900 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-slate-300">
                   <span className="sr-only">Close menu</span>
                   <XIcon className="h-6 w-6" aria-hidden="true" />
                 </Popover.Button>
@@ -98,7 +96,7 @@ export default function Header({ navigation, isUserLoggedIn }: Props) {
                   <Link
                     to={item.href}
                     key={item.href}
-                    className="block px-3 py-2 rounded-md text-base font-medium text-slate-900 hover:bg-slate-200"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-slate-900 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-slate-300"
                   >
                     {item.name}
                   </Link>

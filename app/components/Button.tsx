@@ -19,13 +19,15 @@ export default function Button({
   ButtonHTMLAttributes<HTMLButtonElement>) {
   let color;
   if (primary) {
-    color = "bg-slate-600 text-white font-medium hover:bg-slate-700";
+    color =
+      "bg-slate-600 text-white font-medium hover:bg-slate-700 focus:ring-slate-800";
   }
   if (secondary) {
-    color = "bg-slate-100 text-slate-800 font-medium hover:bg-slate-200";
+    color =
+      "bg-slate-100 text-slate-800 font-medium hover:bg-slate-200 focus:ring-slate-300";
   }
 
-  const className = `block text-center whitespace-nowrap w-full py-3 px-4 rounded-md shadow ${color}`;
+  const className = `block text-center whitespace-nowrap w-full py-3 px-4 rounded-md shadow focus:outline-none focus:ring-2 focus:ring-inset ${color}`;
 
   return to ? (
     <Link {...props} to={to} className={className}>

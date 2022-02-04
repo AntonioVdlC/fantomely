@@ -1,9 +1,10 @@
-import { LoaderFunction, Outlet, redirect } from "remix";
+import type { LoaderFunction } from "remix";
+import { Outlet, redirect } from "remix";
+
 import { requireValidSession } from "~/utils/session.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await requireValidSession(request);
-
 
   if (!user) {
     return redirect("/auth/login");
@@ -19,8 +20,9 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function OnboardingRoute() {
   return (
     <>
-      <div>This is the onboarding!</div>
-      <Outlet />
+      <div className="h-screen bg-slate-50 flex flex-col justify-center items-center overflow-hidden">
+        <Outlet />
+      </div>
     </>
   );
 }

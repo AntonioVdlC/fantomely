@@ -49,7 +49,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const elId = searchParams.get("elId");
 
   if (!websiteId) {
-    return redirect("/app/home");
+    return redirect("/app/");
   }
 
   const user = await requireCurrentUser(request);

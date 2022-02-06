@@ -58,7 +58,7 @@ export const action: ActionFunction = async ({ request }) => {
     where: { url: origin, createdById: user.id, orgId: user.currentOrg.id },
   });
   if (existingWebsite) {
-    return redirect(`/app/website/edit/${existingWebsite.id}`);
+    return redirect(`/app/websites/details/${existingWebsite.id}`);
   }
 
   // TODO: check website limit according to current plan

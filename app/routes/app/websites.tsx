@@ -25,7 +25,7 @@ export default function WebsitesRoute() {
   return (
     <>
       <p>Home</p>
-      <Link to="/app/website/create">Create Website Tracking</Link>
+      <Link to="/app/websites/create">Create Website Tracking</Link>
       <p>Websites:</p>
       <ul>
         {data.websites.map((website) => (

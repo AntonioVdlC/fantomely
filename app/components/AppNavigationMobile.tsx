@@ -1,31 +1,25 @@
 import { Transition, Dialog } from "@headlessui/react";
 import { XIcon } from "@heroicons/react/outline";
-import { FC, Fragment } from "react";
+import { Fragment } from "react";
 import classNames from "~/utils/class-names";
 import Logo from "~/components/Logo";
+import { Link } from "remix";
+
+import type { NavigationItem } from "~/components/AppContainer";
 
 type Props = {
   sidebarOpen: boolean;
   setSidebarOpen: (val: boolean) => void;
-  navigation: Array<{
-    name: string;
-    href: string;
-    icon: FC<any>;
-    current: boolean;
-  }>;
-  secondaryNavigation: Array<{
-    name: string;
-    href: string;
-    icon: FC<any>;
-    current: boolean;
-  }>;
+  navigation: {
+    main: NavigationItem[];
+    secondary: NavigationItem[];
+  };
 };
 
 export default function AppNavigationMobile({
   sidebarOpen,
   setSidebarOpen,
   navigation,
-  secondaryNavigation,
 }: Props) {
   return (
     <Transition.Root show={sidebarOpen} as={Fragment}>
@@ -83,10 +77,11 @@ export default function AppNavigationMobile({
               aria-label="Sidebar"
             >
               <div className="px-2 space-y-1">
-                {navigation.map((item) => (
-                  <a
+                {navigation.main.map((item) => (
+                  <Link
                     key={item.name}
-                    href={item.href}
+                    to={item.href}
+                    onClick={() => setSidebarOpen(false)}
                     className={classNames(
                       item.current
                         ? "bg-slate-800 text-white"
@@ -100,23 +95,30 @@ export default function AppNavigationMobile({
                       aria-hidden="true"
                     />
                     {item.name}
-                  </a>
+                  </Link>
                 ))}
               </div>
               <div className="mt-6 pt-6">
                 <div className="px-2 space-y-1">
-                  {secondaryNavigation.map((item) => (
-                    <a
+                  {navigation.secondary.map((item) => (
+                    <Link
                       key={item.name}
-                      href={item.href}
-                      className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-slate-100 hover:text-white hover:bg-slate-600"
+                      to={item.href}
+                      onClick={() => setSidebarOpen(false)}
+                      className={classNames(
+                        item.current
+                          ? "bg-slate-800 text-white"
+                          : "text-slate-100 hover:text-white hover:bg-slate-600",
+                        "group flex items-center px-2 py-2 text-base font-medium rounded-md"
+                      )}
+                      aria-current={item.current ? "page" : undefined}
                     >
                       <item.icon
                         className="mr-4 h-6 w-6 text-slate-200"
                         aria-hidden="true"
                       />
                       {item.name}
-                    </a>
+                    </Link>
                   ))}
                 </div>
               </div>

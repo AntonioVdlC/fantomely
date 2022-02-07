@@ -1,238 +1,204 @@
-import {
-  Browser,
-  Event,
-  Path,
-  Period,
-  Platform,
-  Website,
-} from "@prisma/client";
+import { Website } from "@prisma/client";
 import { Link, LoaderFunction, redirect, useLoaderData } from "remix";
 import { db } from "~/utils/db.server";
 import { requireCurrentUser } from "~/utils/session.server";
 
-import BrushChart from "~/components/BrushChart.client";
-import { useEffect, useState } from "react";
+import {
+  ArrowSmUpIcon,
+  ArrowSmDownIcon,
+  MinusSmIcon,
+} from "@heroicons/react/outline";
+import classNames from "~/utils/class-names";
+import { generateWebsiteColor, generateWebsiteInitials } from "~/utils/website";
 
-type DashboardElement = {
-  id: string;
-  value: string | number;
-  count: number;
+type PageViewsItem = {
+  value: {
+    current: number;
+    previous: number;
+  };
+  change: number;
 };
 
 type LoaderData = {
-  website: Website;
-  events: (Event & {
-    path: Path;
-    period: Period;
-    browser?: Browser;
-    platform?: Platform;
-  })[];
-  element: Path | Browser | Platform | undefined;
-  paths: DashboardElement[];
-  periods: DashboardElement[];
-  browsers: DashboardElement[];
-  platforms: DashboardElement[];
+  websites: (Website & { pageViews: PageViewsItem })[];
 };
 
-type ElementKey = "path" | "browser" | "platform" | undefined;
-
 export const loader: LoaderFunction = async ({ request }) => {
-  const { searchParams } = new URL(request.url);
-  const websiteId = searchParams.get("w");
-  const el: ElementKey =
-    searchParams.get("el") &&
-    ["path", "browser", "platform"].includes(
-      searchParams.get("el")?.toString() ?? ""
-    )
-      ? (searchParams.get("el") as ElementKey)
-      : undefined;
-  const elId = searchParams.get("elId");
-
-  if (!websiteId) {
-    return redirect("/app/");
-  }
-
   const user = await requireCurrentUser(request);
-  const website = await db.website.findFirst({
-    where: { id: websiteId, orgId: user.currentOrg.id },
-  });
-  if (!website) {
-    throw new Response("Website not found", { status: 404 });
-  }
-
-  let where = { websiteId: website.id };
-  if (el && ["path"].includes(el) && elId) {
-    where = { ...where, [`${el}Id`]: elId };
-  }
-
-  const events = await db.event.findMany({
-    where,
-    include: { path: true, period: true, browser: true, platform: true },
-    orderBy: { period: { createdAt: "asc" } },
+  const websites = await db.website.findMany({
+    where: { orgId: user.currentOrg.id, isActive: true },
   });
 
-  let element;
-  if (el && ["path", "browser", "platform"].includes(el) && elId) {
-    const event = events.find((event) => Boolean(event[el]));
-    if (event) {
-      element = event[el];
-    }
+  if (!websites.length) {
+    return redirect("/app/websites");
   }
 
-  const paths: DashboardElement[] = [];
-  const periods: (DashboardElement & {
-    year: number;
-    month: number;
-    day: number;
-  })[] = [];
-  const browsers: DashboardElement[] = [];
-  const platforms: DashboardElement[] = [];
-  events.forEach((event) => {
-    const path = paths.find((path) => path.id === event.pathId);
-    if (path) {
-      path.count += event.count;
-    } else {
-      paths.push({
-        id: event.pathId,
-        value: event.path.value,
-        count: event.count,
-      });
-    }
+  if (websites.length === 1) {
+    return redirect(`/app/dashboard/${websites[0].id}`);
+  }
 
-    const period = periods.find(
-      (period) =>
-        period.year === event.period.year &&
-        period.month === event.period.month &&
-        period.day === event.period.day
-    );
-    if (period) {
-      period.count += event.count;
-    } else {
-      periods.push({
-        id: event.periodId,
-        value: Date.UTC(
-          event.period.year,
-          event.period.month - 1,
-          event.period.day
-        ),
-        year: event.period.year,
-        month: event.period.month,
-        day: event.period.day,
-        count: event.count,
-      });
-    }
-
-    if (event.browser) {
-      const browser = browsers.find(
-        (browser) => browser.id === event.browser?.id
-      );
-      if (browser) {
-        browser.count += event.count;
-      } else {
-        browsers.push({
-          id: event.browser.id,
-          value: event.browser.value,
-          count: event.count,
-        });
-      }
-    }
-
-    if (event.platform) {
-      const platform = platforms.find(
-        (platform) => platform.id === event.platform?.id
-      );
-      if (platform) {
-        platform.count += event.count;
-      } else {
-        platforms.push({
-          id: event.platform.id,
-          value: event.platform.value,
-          count: event.count,
-        });
-      }
-    }
-  });
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const month = now.getUTCMonth() + 1;
+  const day = now.getUTCDate();
+  const hour = now.getUTCHours();
 
   return {
-    website,
-    events,
-    element,
-    paths,
-    periods: periods.map((period) => ({
-      id: period.id,
-      value: period.value,
-      count: period.count,
-    })),
-    platforms,
-    browsers,
+    websites: await Promise.all(
+      websites.map(async (website) => {
+        const value = { current: 0, previous: 0 };
+
+        const currentPeriod = await db.period.findUnique({
+          where: {
+            period_website: {
+              year,
+              month,
+              day,
+              hour,
+              websiteId: website.id,
+            },
+          },
+        });
+        if (currentPeriod) {
+          const events = await db.event.findMany({
+            where: { websiteId: website.id, periodId: currentPeriod.id },
+          });
+
+          value.current = events.reduce(
+            (sum, event) => (sum += event.count),
+            0
+          );
+        }
+
+        const previousDate = new Date(now.getTime() - 60 * 60 * 1000);
+        const previousYear = previousDate.getUTCFullYear();
+        const previousMonth = previousDate.getUTCMonth() + 1;
+        const previousDay = previousDate.getUTCDate();
+        const previousHour = previousDate.getUTCHours();
+
+        const previousPeriod = await db.period.findUnique({
+          where: {
+            period_website: {
+              year: previousYear,
+              month: previousMonth,
+              day: previousDay,
+              hour: previousHour,
+              websiteId: website.id,
+            },
+          },
+        });
+        if (previousPeriod) {
+          const events = await db.event.findMany({
+            where: { websiteId: website.id, periodId: previousPeriod.id },
+          });
+
+          value.previous = events.reduce(
+            (sum, event) => (sum += event.count),
+            0
+          );
+        }
+
+        const pageViews = {
+          value,
+          change: value.current - value.previous,
+        };
+        return { ...website, pageViews };
+      })
+    ),
   };
 };
 
 export default function DashboardRoute() {
   const data = useLoaderData<LoaderData>();
 
-  const [isMounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-
   return (
     <>
-      <p>Dashboard</p>
-
-      {data.website.url}
-
-      <p>
-        Total page views for {data.element?.value}:{" "}
-        {data.events.reduce((total, event) => (total += event.count), 0)}
-      </p>
-
-      {isMounted && data.periods.length ? (
-        <BrushChart
-          data={data.periods.map((period) => [
-            new Date(period.value).getTime(),
-            period.count,
-          ])}
-        />
-      ) : null}
-
-      <p>Periods:</p>
-      <ul>
-        {data.periods.map((period) => (
-          <li key={period.id}>
-            {new Date(period.value).toString()} | {period.count}
-          </li>
-        ))}
-      </ul>
-
-      <p>Paths:</p>
-      <ul>
-        {data.paths.map((path) => (
-          <li key={path.id}>
-            <Link
-              to={`/app/dashboard?w=${data.website.id}&el=path&elId=${path.id}`}
+      <div>
+        <h2 className="text-slate-500 text-xs font-medium uppercase tracking-wide">
+          Page Views (live)
+        </h2>
+        <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {data.websites.map((website) => (
+            <div
+              key={website.id}
+              className="relative bg-white pt-4 px-4 pb-[4.5rem] sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden flex"
             >
-              {path.value} | {path.count}
-            </Link>
-          </li>
-        ))}
-      </ul>
+              <div
+                className={classNames(
+                  generateWebsiteColor(website.name),
+                  "flex-shrink-0 flex items-center justify-center w-16 text-white text-2xl font-medium rounded-md shadow-sm"
+                )}
+              >
+                {generateWebsiteInitials(website.name)}
+              </div>
+              <div className="flex-1 flex flex-col justify-between py-2">
+                <dt>
+                  <p className="ml-4 text-sm font-medium text-slate-500 truncate">
+                    {website.name || website.url}
+                  </p>
+                </dt>
+                <dd className="ml-4 flex items-center justify-between">
+                  <p className="text-2xl font-semibold text-slate-900">
+                    {website.pageViews.value.current}
+                  </p>
+                  <div
+                    className={classNames(
+                      website.pageViews.change > 0
+                        ? "bg-green-100 text-green-800"
+                        : website.pageViews.change < 0
+                        ? "bg-red-100 text-red-800"
+                        : "bg-slate-100 text-slate-800",
+                      "inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium md:mt-2 lg:mt-0"
+                    )}
+                  >
+                    {website.pageViews.change > 0 ? (
+                      <ArrowSmUpIcon
+                        className="-ml-1 mr-0.5 flex-shrink-0 self-center h-5 w-5 text-green-500"
+                        aria-hidden="true"
+                      />
+                    ) : website.pageViews.change < 0 ? (
+                      <ArrowSmDownIcon
+                        className="-ml-1 mr-0.5 flex-shrink-0 self-center h-5 w-5 text-red-500"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <MinusSmIcon
+                        className="-ml-1 mr-0.5 flex-shrink-0 self-center h-5 w-5 text-slate-500"
+                        aria-hidden="true"
+                      />
+                    )}
 
-      <p>Browsers:</p>
-      <ul>
-        {data.browsers.map((browser) => (
-          <li key={browser.id}>
-            {browser.value} | {browser.count}
-          </li>
-        ))}
-      </ul>
-
-      <p>Platforms:</p>
-      <ul>
-        {data.platforms.map((platform) => (
-          <li key={platform.id}>
-            {platform.value} | {platform.count}
-          </li>
-        ))}
-      </ul>
+                    <span className="sr-only">
+                      {website.pageViews.change > 0
+                        ? "Increased"
+                        : website.pageViews.change < 0
+                        ? "Decreased"
+                        : "Stayed same"}{" "}
+                      by
+                    </span>
+                    {Math.abs(website.pageViews.change)}
+                  </div>
+                  <div className="absolute bottom-0 inset-x-0 bg-slate-50 px-4 py-4 sm:px-6">
+                    <div className="text-sm">
+                      <Link
+                        to={`/app/dashboard/${website.id}`}
+                        className="font-medium text-slate-600 hover:text-slate-500 block"
+                      >
+                        {" "}
+                        View all
+                        <span className="sr-only">
+                          {" "}
+                          {website.name || website.url} stats
+                        </span>
+                      </Link>
+                    </div>
+                  </div>
+                </dd>
+              </div>
+            </div>
+          ))}
+        </dl>
+      </div>
     </>
   );
 }

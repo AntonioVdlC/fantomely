@@ -1,7 +1,15 @@
 import { ChevronRightIcon } from "@heroicons/react/outline";
 import { HomeIcon } from "@heroicons/react/solid";
+import { Website } from "@prisma/client";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "remix";
+
+// https://stackoverflow.com/a/38191078
+function isUUID(str: string) {
+  return /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i.test(
+    str
+  );
+}
 
 type CrumbItem = {
   name: string;
@@ -9,7 +17,11 @@ type CrumbItem = {
   current: boolean;
 };
 
-export default function Breadcrumbs() {
+type Props = {
+  websites: Website[];
+};
+
+export default function Breadcrumbs({ websites }: Props) {
   const [crumbs, setCrumbs] = useState<CrumbItem[]>([]);
 
   const location = useLocation();
@@ -28,8 +40,13 @@ export default function Breadcrumbs() {
       const part = parts[i];
       globalPath += part + "/";
 
-      // TODO: get name for uuids
-      const crumb = { name: part.toUpperCase(), href: globalPath };
+      let name = part;
+      if (isUUID(part)) {
+        if (globalPath.includes("websites")) {
+          name = websites.find((website) => website.id === part)?.name || part;
+        }
+      }
+      const crumb = { name, href: globalPath };
 
       crumbs.push({ ...crumb, current: i === parts.length - 1 });
     }
@@ -57,7 +74,7 @@ export default function Breadcrumbs() {
               />
               <Link
                 to={page.href}
-                className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
+                className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700 uppercase"
                 aria-current={page.current ? "page" : undefined}
               >
                 {page.name}

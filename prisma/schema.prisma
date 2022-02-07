@@ -131,6 +131,7 @@ model Website {
   platforms     Platform[]
   createdById   String
   createdByUser User       @relation(fields: [createdById], references: [id])
+  isActive      Boolean    @default(true)
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 

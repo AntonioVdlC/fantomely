@@ -16,7 +16,10 @@ export default function AppNavigationSide({ navigation }: Props) {
     <div className="hidden lg:flex lg:w-48 lg:flex-col lg:fixed lg:inset-y-0">
       <div className="flex flex-col flex-grow bg-white pt-4 overflow-y-auto">
         <div className="flex items-center flex-shrink-0 px-4 bg-white">
-          <Logo size="xs" withText />
+          <Link to="/">
+            <span className="sr-only">Landing Screen</span>
+            <Logo size="xs" withText />
+          </Link>
         </div>
         <nav
           className="mt-4 pt-6 flex-1 flex flex-col overflow-y-auto bg-slate-700"

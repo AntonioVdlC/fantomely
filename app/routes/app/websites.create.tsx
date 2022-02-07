@@ -5,12 +5,6 @@ import { generatePublicKey } from "~/utils/api.server";
 import { isValidURL } from "~/utils/is-valid";
 import { requireCurrentUser } from "~/utils/session.server";
 
-function validateURL(url: unknown) {
-  if (typeof url !== "string" || !isValidURL(url)) {
-    return `The URL is invalid`;
-  }
-}
-
 export const action: ActionFunction = async ({ request }) => {
   const user = await requireCurrentUser(request);
 
@@ -19,11 +13,12 @@ export const action: ActionFunction = async ({ request }) => {
   // Validate form
   const url = form.get("url");
   const name = form.get("name") || "";
+
   if (typeof url !== "string" || typeof name !== "string") {
     throw new Response("Form inputs are not correct.", { status: 400 });
   }
 
-  if (!validateURL(url)) {
+  if (!isValidURL(url)) {
     throw new Response("Link is not valid.", { status: 400 });
   }
 

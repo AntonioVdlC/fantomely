@@ -4,7 +4,7 @@ import {
   CreditCardIcon,
   CogIcon,
 } from "@heroicons/react/outline";
-import { User } from "@prisma/client";
+import { User, Website } from "@prisma/client";
 import { FC, ReactChild, useEffect, useState } from "react";
 import { useLocation } from "remix";
 import AppNavigationMobile from "./AppNavigationMobile";
@@ -26,9 +26,10 @@ type Navigation = {
 type Props = {
   children: ReactChild;
   user: User;
+  websites: Website[];
 };
 
-export default function AppContainer({ children, user }: Props) {
+export default function AppContainer({ children, user, websites }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [navigation, setNavigation] = useState<Navigation>(() => {
@@ -91,7 +92,11 @@ export default function AppContainer({ children, user }: Props) {
       <AppNavigationSide navigation={navigation} />
 
       <div className="lg:pl-48 flex flex-col flex-1">
-        <AppNavigationTop setSidebarOpen={setSidebarOpen} user={user} />
+        <AppNavigationTop
+          setSidebarOpen={setSidebarOpen}
+          user={user}
+          websites={websites}
+        />
         <main className="flex-1 p-6">{children}</main>
       </div>
     </div>

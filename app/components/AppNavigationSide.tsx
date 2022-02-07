@@ -19,10 +19,10 @@ export default function AppNavigationSide({ navigation }: Props) {
           <Logo size="xs" withText />
         </div>
         <nav
-          className="mt-4 pt-6 flex-1 flex flex-col divide-y divide-slate-800 overflow-y-auto bg-slate-700"
+          className="mt-4 pt-6 flex-1 flex flex-col overflow-y-auto bg-slate-700"
           aria-label="Sidebar"
         >
-          <div className="px-2 space-y-1">
+          <div className="px-2 space-y-2">
             {navigation.main.map((item) => (
               <Link
                 key={item.name}
@@ -43,8 +43,9 @@ export default function AppNavigationSide({ navigation }: Props) {
               </Link>
             ))}
           </div>
-          <div className="mt-6 pt-6">
-            <div className="px-2 space-y-1">
+          <div className="flex-grow"></div>
+          <div className="mt-6 pb-4">
+            <div className="px-2 space-y-2">
               {navigation.secondary.map((item) => (
                 <Link
                   key={item.name}

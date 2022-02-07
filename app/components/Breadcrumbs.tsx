@@ -26,7 +26,7 @@ export default function Breadcrumbs() {
     let globalPath = "/app/";
     for (let i = 0, length = parts.length; i < length; i++) {
       const part = parts[i];
-      globalPath += part;
+      globalPath += part + "/";
 
       // TODO: get name for uuids
       const crumb = { name: part.toUpperCase(), href: globalPath };

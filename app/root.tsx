@@ -41,7 +41,7 @@ function Document({
         <title>{title}</title>
         <Links />
       </head>
-      <body className="h-full">
+      <body className="h-full text-slate-900">
         {children}
         <Scripts />
         {process.env.NODE_ENV === "development" ? <LiveReload /> : null}

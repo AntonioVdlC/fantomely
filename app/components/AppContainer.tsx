@@ -1,7 +1,6 @@
 import {
   GlobeIcon,
   DocumentReportIcon,
-  UserGroupIcon,
   CreditCardIcon,
   CogIcon,
 } from "@heroicons/react/outline";
@@ -47,17 +46,11 @@ export default function AppContainer({ children, user }: Props) {
           icon: DocumentReportIcon,
           current: false,
         },
-        {
-          name: "Team",
-          href: "/app/team",
-          icon: UserGroupIcon,
-          current: false,
-        },
       ],
       secondary: [
         {
-          name: "Billing",
-          href: "/app/billing",
+          name: "Plan",
+          href: "/app/plan",
           icon: CreditCardIcon,
           current: false,
         },

@@ -42,7 +42,10 @@ export default function Breadcrumbs({ websites }: Props) {
 
       let name = part;
       if (isUUID(part)) {
-        if (globalPath.includes("websites")) {
+        if (
+          globalPath.includes("websites") ||
+          globalPath.includes("dashboard")
+        ) {
           name = websites.find((website) => website.id === part)?.name || part;
         }
       }

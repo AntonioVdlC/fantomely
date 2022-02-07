@@ -37,11 +37,11 @@ export const loader: LoaderFunction = async ({ request }) => {
     return redirect(`/app/dashboard/${websites[0].id}`);
   }
 
-  const now = new Date();
-  const year = now.getUTCFullYear();
-  const month = now.getUTCMonth() + 1;
-  const day = now.getUTCDate();
-  const hour = now.getUTCHours();
+  const currentDate = new Date();
+  const year = currentDate.getUTCFullYear();
+  const month = currentDate.getUTCMonth() + 1;
+  const day = currentDate.getUTCDate();
+  const hour = currentDate.getUTCHours();
 
   return {
     websites: await Promise.all(
@@ -70,7 +70,7 @@ export const loader: LoaderFunction = async ({ request }) => {
           );
         }
 
-        const previousDate = new Date(now.getTime() - 60 * 60 * 1000);
+        const previousDate = new Date(currentDate.getTime() - 60 * 60 * 1000);
         const previousYear = previousDate.getUTCFullYear();
         const previousMonth = previousDate.getUTCMonth() + 1;
         const previousDay = previousDate.getUTCDate();

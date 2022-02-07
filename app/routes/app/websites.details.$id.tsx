@@ -28,7 +28,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
 export default function WebsiteDetailsRoute() {
   const data = useLoaderData<LoaderData>();
-  const script = `<script async src="${data.origin}/sdk/browser.js" data-fantomely data-h="${data.origin}" data-k="${data.website.publicKey}"></script>`;
+  const script = `<script defer src="${data.origin}/sdk/browser.js" data-fantomely data-h="${data.origin}" data-k="${data.website.publicKey}"></script>`;
 
   const [copiedScriptToClipboard, setCopiedScriptToClipboard] = useState(false);
 

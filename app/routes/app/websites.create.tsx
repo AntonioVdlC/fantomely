@@ -34,6 +34,12 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   // TODO: check website limit according to current plan
+  const websitesCount = await db.website.count({
+    where: { orgId: user.currentOrg.id, isActive: true },
+  });
+  if (websitesCount >= 3) {
+    throw new Response("Website limit reached.", { status: 400 });
+  }
 
   // Generate new API public key
   const publicKey = generatePublicKey();

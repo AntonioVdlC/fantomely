@@ -14,6 +14,7 @@ import { generateWebsiteColor, generateWebsiteInitials } from "~/utils/website";
 
 type LoaderData = {
   websites: Website[];
+  isWebsiteCountBelowLimit: boolean;
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -25,6 +26,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   return {
     websites,
+    // TODO: check website limit according to current plan
+    isWebsiteCountBelowLimit: websites.length < 3,
   };
 };
 
@@ -47,7 +50,7 @@ export default function WebsitesRoute() {
                 <div
                   className={classNames(
                     generateWebsiteColor(website.name),
-                    "flex-shrink-0 flex items-center justify-center w-16 text-white text-sm font-medium rounded-l-md shadow-sm"
+                    "flex-shrink-0 flex items-center justify-center w-16 text-white text-xl font-medium rounded-l-md shadow-sm"
                   )}
                 >
                   {generateWebsiteInitials(website.name)}
@@ -124,7 +127,10 @@ export default function WebsitesRoute() {
                             </Link>
                           )}
                         </Menu.Item>
-                        <form method="POST" action="#">
+                        <Form
+                          method="post"
+                          action={`/app/websites/delete/${website.id}`}
+                        >
                           <Menu.Item>
                             {({ active }) => (
                               <button
@@ -140,7 +146,7 @@ export default function WebsitesRoute() {
                               </button>
                             )}
                           </Menu.Item>
-                        </form>
+                        </Form>
                       </div>
                     </Menu.Items>
                   </Transition>
@@ -166,34 +172,42 @@ export default function WebsitesRoute() {
           Add a new website
         </h2>
 
-        <Form
-          method="post"
-          action="/app/websites/create"
-          className="mt-3 space-y-4"
-        >
-          <div className="grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5 4xl:grid-cols-6">
-            <Input
-              type="text"
-              id="name"
-              name="name"
-              label="Name"
-              placeholder="Fantomely"
-            />
-            <Input
-              type="text"
-              id="url"
-              name="url"
-              label="Link"
-              placeholder="https://fantomely.com"
-              required
-            />
-          </div>
-          <div className="grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5 4xl:grid-cols-6">
-            <Button primary type="submit">
-              Add website
-            </Button>
-          </div>
-        </Form>
+        {data.isWebsiteCountBelowLimit ? (
+          <Form
+            method="post"
+            action="/app/websites/create"
+            className="mt-3 space-y-4"
+          >
+            <div className="grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5 4xl:grid-cols-6">
+              <Input
+                type="text"
+                id="name"
+                name="name"
+                label="Name"
+                placeholder="Fantomely"
+              />
+              <Input
+                type="text"
+                id="url"
+                name="url"
+                label="Link"
+                placeholder="https://fantomely.com"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5 4xl:grid-cols-6">
+              <Button primary type="submit">
+                Add website
+              </Button>
+            </div>
+          </Form>
+        ) : (
+          <p className="text-sm mt-3">
+            You have reached the limit of websites you can add with your current{" "}
+            <Link to="/app/plan">plan</Link>. Please delete another webiste or
+            upgrade your plan to add more websites.
+          </p>
+        )}
       </div>
     </>
   );

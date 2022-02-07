@@ -36,9 +36,9 @@ type LoaderData = {
 
 type ElementKey = "path" | "browser" | "platform" | undefined;
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async ({ request, params }) => {
   const { searchParams } = new URL(request.url);
-  const websiteId = searchParams.get("w");
+  const websiteId = params.id;
   const el: ElementKey =
     searchParams.get("el") &&
     ["path", "browser", "platform"].includes(
@@ -208,7 +208,7 @@ export default function DashboardRoute() {
         {data.paths.map((path) => (
           <li key={path.id}>
             <Link
-              to={`/app/dashboard?w=${data.website.id}&el=path&elId=${path.id}`}
+              to={`/app/dashboard/${data.website.id}?el=path&elId=${path.id}`}
             >
               {path.value} | {path.count}
             </Link>

@@ -40,10 +40,6 @@ export const loader: LoaderFunction = async ({ request }) => {
     return redirect("/app/websites");
   }
 
-  if (websites.length === 1) {
-    return redirect(`/app/dashboard/${websites[0].id}`);
-  }
-
   const currentDate = new Date();
 
   return {

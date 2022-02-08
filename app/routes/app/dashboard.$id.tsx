@@ -8,10 +8,20 @@ import {
 } from "@prisma/client";
 import { Link, LoaderFunction, redirect, useLoaderData } from "remix";
 import { db } from "~/utils/db.server";
-import { requireCurrentUser } from "~/utils/session.server";
+import {
+  generateRandomString,
+  requireCurrentUser,
+} from "~/utils/session.server";
 
 import BrushChart from "~/components/BrushChart.client";
 import { useEffect, useState } from "react";
+
+import illustration from "~/assets/illustration_dashboard_empty.svg";
+import Button from "~/components/Button";
+import H2 from "~/components/SectionHeader";
+import classNames from "~/utils/class-names";
+import { generateWebsiteColor, generateWebsiteInitials } from "~/utils/website";
+import LayoutGrid from "~/components/LayoutGrid";
 
 type DashboardElement = {
   id: string;
@@ -85,6 +95,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     month: number;
     day: number;
   })[] = [];
+  const filledPeriods: DashboardElement[] = [];
   const browsers: DashboardElement[] = [];
   const platforms: DashboardElement[] = [];
   events.forEach((event) => {
@@ -153,16 +164,33 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     }
   });
 
+  for (
+    let i = 0, date = periods[0].value as number;
+    i < periods.length || date < Date.now();
+    date += 24 * 60 * 60 * 1000
+  ) {
+    if (periods[i]?.value === date) {
+      filledPeriods.push({
+        id: periods[i].id,
+        value: periods[i].value,
+        count: periods[i].count,
+      });
+      i++;
+      continue;
+    }
+    filledPeriods.push({
+      id: generateRandomString(8),
+      value: date,
+      count: Math.ceil(Math.random() * 10),
+    });
+  }
+
   return {
     website,
     events,
     element,
     paths,
-    periods: periods.map((period) => ({
-      id: period.id,
-      value: period.value,
-      count: period.count,
-    })),
+    periods: filledPeriods,
     platforms,
     browsers,
   };
@@ -174,24 +202,85 @@ export default function DashboardRoute() {
   const [isMounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  return (
+  return data.periods.length ? (
     <>
-      <p>Dashboard</p>
+      <LayoutGrid>
+        <div>
+          <H2>Dashboard for {data.website.name}</H2>
+          <div className="mt-1 flex">
+            <div
+              className={classNames(
+                generateWebsiteColor(data.website.name),
+                "flex-shrink-0 flex items-center justify-center w-16 text-white text-xl font-medium rounded-l-md shadow-sm"
+              )}
+            >
+              {generateWebsiteInitials(data.website.name)}
+            </div>
+            <div className="flex-1 flex items-center justify-between border-t border-r border-b border-slate-200 bg-white rounded-r-md truncate shadow-sm">
+              <div className="flex-1 px-4 py-2 text-sm truncate">
+                <Link
+                  to={`/app/websites/details/${data.website.id}`}
+                  className="block text-slate-900 font-medium hover:text-slate-600"
+                >
+                  {data.website.name}
+                </Link>
 
-      {data.website.url}
+                <a
+                  href={data.website.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block text-slate-500 hover:text-slate-600 hover:underline"
+                >
+                  {data.website.url}
+                </a>
+              </div>
+              <div className="flex-shrink-0 pr-2"></div>
+            </div>
+          </div>
+        </div>
+      </LayoutGrid>
+      <div className="mt-3"></div>
+      <LayoutGrid>
+        <div>
+          <H2>Total page views</H2>
+          <p className="mt-1 text-3xl">
+            {data.events.reduce((total, event) => (total += event.count), 0)}
+          </p>
+        </div>
 
-      <p>
-        Total page views for {data.element?.value}:{" "}
-        {data.events.reduce((total, event) => (total += event.count), 0)}
-      </p>
+        {data.element?.value ? (
+          <div>
+            <H2>Viewing subset for</H2>
+            <p className="mt-1">{data.element.value}</p>
+          </div>
+        ) : (
+          <div></div>
+        )}
+
+        {data.element?.value ? (
+          <div>
+            <Button secondary to={`/app/dashboard/${data.website.id}`}>
+              Back to overview
+            </Button>
+          </div>
+        ) : (
+          <div></div>
+        )}
+      </LayoutGrid>
 
       {isMounted && data.periods.length ? (
-        <BrushChart
-          data={data.periods.map((period) => [
-            new Date(period.value).getTime(),
-            period.count,
-          ])}
-        />
+        <div className="mt-3">
+          <H2>Page Views Chart</H2>
+          <div className="mt-1">
+            <BrushChart
+              key={data.element?.id || data.website.id}
+              data={data.periods.map((period) => [
+                new Date(period.value).getTime(),
+                period.count,
+              ])}
+            />
+          </div>
+        </div>
       ) : null}
 
       <p>Periods:</p>
@@ -234,5 +323,31 @@ export default function DashboardRoute() {
         ))}
       </ul>
     </>
+  ) : (
+    <div className="flex flex-col items-center max-w-xl mx-auto">
+      <img
+        className="h-60"
+        src={illustration}
+        alt="Woman looking at an empty canvas."
+      />
+      <p className="mt-3 text-center">
+        No events registered yet for{" "}
+        <Link
+          className="font-bold"
+          to={`/app/websites/details/${data.website.id}`}
+        >
+          {data.website.name}
+        </Link>
+        . Please make sure that you have properly set up the tracking script.
+      </p>
+      <p className="mt-3 w-full">
+        <Button to={`/app/websites/details/${data.website.id}`} primary>
+          See website details
+        </Button>
+      </p>
+      <p className="mt-3 text-sm">
+        <Link to="/docs">Need help?</Link>
+      </p>
+    </div>
   );
 }

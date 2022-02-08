@@ -90,7 +90,7 @@ export default function DashboardItem({ item }: Props) {
                 className="font-medium text-slate-600 hover:text-slate-500 block"
               >
                 {" "}
-                View all
+                View details
                 <span className="sr-only"> {item.name} stats</span>
               </Link>
             </div>

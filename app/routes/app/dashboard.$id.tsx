@@ -6,7 +6,13 @@ import {
   Platform,
   Website,
 } from "@prisma/client";
-import { Link, LoaderFunction, redirect, useLoaderData } from "remix";
+import {
+  Link,
+  LoaderFunction,
+  redirect,
+  useLoaderData,
+  useNavigate,
+} from "remix";
 import { db } from "~/utils/db.server";
 import {
   generateRandomString,
@@ -22,6 +28,8 @@ import H2 from "~/components/SectionHeader";
 import classNames from "~/utils/class-names";
 import { generateWebsiteColor, generateWebsiteInitials } from "~/utils/website";
 import LayoutGrid from "~/components/LayoutGrid";
+import BarChart from "~/components/BarChart.client";
+import Loading from "~/components/Loading";
 
 type DashboardElement = {
   id: string;
@@ -71,7 +79,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   let where = { websiteId: website.id };
-  if (el && ["path"].includes(el) && elId) {
+  if (el && ["path", "browser", "platform"].includes(el) && elId) {
     where = { ...where, [`${el}Id`]: elId };
   }
 
@@ -202,6 +210,8 @@ export default function DashboardRoute() {
   const [isMounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
+  const navigate = useNavigate();
+
   return data.periods.length ? (
     <>
       <LayoutGrid>
@@ -238,15 +248,6 @@ export default function DashboardRoute() {
             </div>
           </div>
         </div>
-      </LayoutGrid>
-      <div className="mt-3"></div>
-      <LayoutGrid>
-        <div>
-          <H2>Total page views</H2>
-          <p className="mt-1 text-3xl">
-            {data.events.reduce((total, event) => (total += event.count), 0)}
-          </p>
-        </div>
 
         {data.element?.value ? (
           <div>
@@ -268,10 +269,12 @@ export default function DashboardRoute() {
         )}
       </LayoutGrid>
 
-      {isMounted && data.periods.length ? (
-        <div className="mt-3">
-          <H2>Page Views Chart</H2>
-          <div className="mt-1">
+      <hr className="mt-4 mb-6" />
+
+      <div className="mt-3">
+        <H2>Page Views Chart</H2>
+        <div className="mt-1">
+          {isMounted ? (
             <BrushChart
               key={data.element?.id || data.website.id}
               data={data.periods.map((period) => [
@@ -279,49 +282,135 @@ export default function DashboardRoute() {
                 period.count,
               ])}
             />
+          ) : (
+            <div className="flex flex-col items-center">
+              <Loading />
+            </div>
+          )}
+        </div>
+      </div>
+
+      <hr className="mt-4 mb-6" />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 4xl:grid-cols-4 gap-6">
+        <div>
+          <H2>Dates</H2>
+          <div className="mt-1">
+            {isMounted ? (
+              <BarChart
+                key={data.element?.id || data.website.id}
+                data={data.periods
+                  .filter((period) => period.count)
+                  .sort((a, b) => b.count - a.count)
+                  .map((period) => period.count)}
+                categories={data.periods
+                  .filter((period) => period.count)
+                  .sort((a, b) => b.count - a.count)
+                  .map((period) =>
+                    new Date(
+                      new Date(period.value).setHours(0, 0, 0, 0)
+                    ).toLocaleDateString(undefined, {
+                      year: "2-digit",
+                      month: "short",
+                      day: "numeric",
+                    })
+                  )}
+                elements={data.periods.map((period) => ({
+                  id: period.id,
+                }))}
+              />
+            ) : (
+              <div className="flex flex-col items-center">
+                <Loading />
+              </div>
+            )}
           </div>
         </div>
-      ) : null}
-
-      <p>Periods:</p>
-      <ul>
-        {data.periods.map((period) => (
-          <li key={period.id}>
-            {new Date(period.value).toString()} | {period.count}
-          </li>
-        ))}
-      </ul>
-
-      <p>Paths:</p>
-      <ul>
-        {data.paths.map((path) => (
-          <li key={path.id}>
-            <Link
-              to={`/app/dashboard/${data.website.id}?el=path&elId=${path.id}`}
-            >
-              {path.value} | {path.count}
-            </Link>
-          </li>
-        ))}
-      </ul>
-
-      <p>Browsers:</p>
-      <ul>
-        {data.browsers.map((browser) => (
-          <li key={browser.id}>
-            {browser.value} | {browser.count}
-          </li>
-        ))}
-      </ul>
-
-      <p>Platforms:</p>
-      <ul>
-        {data.platforms.map((platform) => (
-          <li key={platform.id}>
-            {platform.value} | {platform.count}
-          </li>
-        ))}
-      </ul>
+        <div>
+          <H2>Pages</H2>
+          <div className="mt-1">
+            {isMounted ? (
+              <BarChart
+                key={data.element?.id || data.website.id}
+                data={data.paths
+                  .sort((a, b) => b.count - a.count)
+                  .map((path) => path.count)}
+                categories={data.paths
+                  .sort((a, b) => b.count - a.count)
+                  .map((path) => String(path.value))}
+                elements={data.paths.map((path) => ({
+                  id: path.id,
+                }))}
+                onClick={(id) =>
+                  navigate(
+                    `/app/dashboard/${data.website.id}?el=path&elId=${id}`
+                  )
+                }
+              />
+            ) : (
+              <div className="flex flex-col items-center">
+                <Loading />
+              </div>
+            )}
+          </div>
+        </div>
+        <div>
+          <H2>Browsers</H2>
+          <div className="mt-1">
+            {isMounted ? (
+              <BarChart
+                key={data.element?.id || data.website.id}
+                data={data.browsers
+                  .sort((a, b) => b.count - a.count)
+                  .map((browser) => browser.count)}
+                categories={data.browsers
+                  .sort((a, b) => b.count - a.count)
+                  .map((browser) => String(browser.value))}
+                elements={data.browsers.map((browser) => ({
+                  id: browser.id,
+                }))}
+                onClick={(id) =>
+                  navigate(
+                    `/app/dashboard/${data.website.id}?el=browser&elId=${id}`
+                  )
+                }
+              />
+            ) : (
+              <div className="flex flex-col items-center">
+                <Loading />
+              </div>
+            )}
+          </div>
+        </div>
+        <div>
+          <H2>Platforms</H2>
+          <div className="mt-1">
+            {isMounted ? (
+              <BarChart
+                key={data.element?.id || data.website.id}
+                data={data.platforms
+                  .sort((a, b) => b.count - a.count)
+                  .map((platform) => platform.count)}
+                categories={data.platforms
+                  .sort((a, b) => b.count - a.count)
+                  .map((platform) => String(platform.value))}
+                elements={data.platforms.map((platform) => ({
+                  id: platform.id,
+                }))}
+                onClick={(id) =>
+                  navigate(
+                    `/app/dashboard/${data.website.id}?el=platform&elId=${id}`
+                  )
+                }
+              />
+            ) : (
+              <div className="flex flex-col items-center">
+                <Loading />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </>
   ) : (
     <div className="flex flex-col items-center max-w-xl mx-auto">

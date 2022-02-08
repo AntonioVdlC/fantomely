@@ -15,7 +15,7 @@ export default function AppNavigationTop({
   websites,
 }: Props) {
   return (
-    <div className="sticky top-0 bg-white z-10 flex-shrink-0 flex h-16 ">
+    <div className="sticky top-0 bg-white z-20 flex-shrink-0 flex h-16">
       <button
         type="button"
         className="px-4 border-r border-slate-200 text-slate-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-slate-500 lg:hidden lg:border-transparent"

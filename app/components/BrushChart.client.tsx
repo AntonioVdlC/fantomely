@@ -1,9 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
-import { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 
-export default function BrushChart({ data }: { data: number[][] }) {
+type Props = {
+  data: number[][];
+};
+
+export default function BrushChart({ data }: Props) {
   const range = Math.min(
     7 * 24 * 60 * 60 * 1000,
     data[data.length - 1][0] - data[0][0]
@@ -18,26 +21,34 @@ export default function BrushChart({ data }: { data: number[][] }) {
       offsetY: 0,
       toolbar: {
         show: true,
+        autoSelected: "selection",
         tools: {
+          download: true,
+          selection: true,
+          zoom: true,
+          zoomin: true,
+          zoomout: true,
           pan: false,
           reset: false,
         },
       },
       events: {
-        mounted: function (ctx: any) {
-          // we need to clear the range as we only need it on the iniital load.
-          ctx.w.config.xaxis.range = undefined;
+        mounted: function (
+          _: never,
+          { config }: { config: { xaxis: { range: number | undefined } } }
+        ) {
+          config.xaxis.range = undefined;
         },
       },
     },
-    colors: ["#475569"],
+    colors: ["#64748b"],
     fill: {
       opacity: 1,
     },
     stroke: {
       width: 3,
       curve: "smooth",
-      colors: ["#475569"],
+      colors: ["#64748b"],
     },
     grid: {
       show: false,
@@ -53,6 +64,11 @@ export default function BrushChart({ data }: { data: number[][] }) {
         fillTo: "origin",
       },
     },
+    tooltip: {
+      x: {
+        format: "dd MMM yyyy",
+      },
+    },
     xaxis: {
       type: "datetime",
       labels: {
@@ -65,7 +81,7 @@ export default function BrushChart({ data }: { data: number[][] }) {
       },
       axisBorder: {
         show: true,
-        color: "#e2e8f0",
+        color: "#1e293b",
       },
       axisTicks: {
         show: false,
@@ -75,6 +91,20 @@ export default function BrushChart({ data }: { data: number[][] }) {
     yaxis: {
       min: 0,
       max: Math.max(...data.map((d) => d[1])) + 1,
+      forceNiceScale: true,
+      labels: {
+        formatter(val: number) {
+          return Math.round(val);
+        },
+      },
+      axisBorder: {
+        show: true,
+        color: "#1e293b",
+      },
+      axisTicks: {
+        show: false,
+      },
+      tickAmount: 4,
     },
   };
 
@@ -134,33 +164,31 @@ export default function BrushChart({ data }: { data: number[][] }) {
     },
   };
 
-  const [state] = useState({
-    series: [
-      {
-        name: "Page Views",
-        data: data,
-      },
-    ],
-  });
+  const series = [
+    {
+      name: "Page Views",
+      data: data,
+    },
+  ];
 
   return (
-    <div id="wrapper">
-      <div id="chart-line2">
+    <div>
+      <div>
+        {/* @ts-ignore */}
         <ReactApexChart
-          // @ts-ignore
           options={options}
-          series={state.series}
-          type="line"
-          height={230}
+          series={series}
+          type={options.chart.type}
+          height={options.chart.height}
         />
       </div>
-      <div id="chart-line">
+      <div className="-mt-5">
+        {/* @ts-ignore */}
         <ReactApexChart
-          // @ts-ignore
           options={optionsLine}
-          series={state.series}
-          type="area"
-          height={130}
+          series={series}
+          type={optionsLine.chart.type}
+          height={optionsLine.chart.height}
         />
       </div>
     </div>

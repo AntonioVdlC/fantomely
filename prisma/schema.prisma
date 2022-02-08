@@ -119,7 +119,7 @@ model MagicLink {
 
 model Website {
   id            String     @id @default(uuid())
-  name          String? // TODO: remove the optionality of this field!
+  name          String
   url           String
   publicKey     String     @unique
   orgId         String

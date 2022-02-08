@@ -6,8 +6,10 @@ import {
 import { Org, User, UserOrg, Website } from "@prisma/client";
 import { useState } from "react";
 import { LoaderFunction, useLoaderData, Link } from "remix";
+import classNames from "~/utils/class-names";
 import { db } from "~/utils/db.server";
 import { requireCurrentUser } from "~/utils/session.server";
+import { generateWebsiteColor, generateWebsiteInitials } from "~/utils/website";
 
 type LoaderData = {
   user: User & {
@@ -47,14 +49,24 @@ export default function WebsiteDetailsRoute() {
         </h2>
       </div>
       <div className="mt-3 grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5 4xl:grid-cols-6">
-        <div>
-          <label
-            htmlFor="name"
-            className="block text-sm text-left font-medium text-slate-700"
+        <div className="flex">
+          <div
+            className={classNames(
+              generateWebsiteColor(data.website.name),
+              "flex-shrink-0 flex items-center justify-center w-16 text-white text-2xl font-medium rounded-md shadow-sm"
+            )}
           >
-            Name
-          </label>
-          <p id="name">{data.website.name || data.website.url}</p>
+            {generateWebsiteInitials(data.website.name)}
+          </div>
+          <div className="ml-2">
+            <label
+              htmlFor="name"
+              className="block text-sm text-left font-medium text-slate-700"
+            >
+              Name
+            </label>
+            <p id="name">{data.website.name}</p>
+          </div>
         </div>
         <div>
           <label
@@ -97,7 +109,10 @@ export default function WebsiteDetailsRoute() {
         </label>
         <p>To start tracking, please add the following line to your website:</p>
 
-        <p className="bg-slate-100 p-4 pr-10 text-sm relative max-w-5xl mt-3">
+        <p
+          className="bg-slate-100 p-4 pr-10 text-sm relative max-w-5xl mt-3"
+          style={{ overflowWrap: "anywhere" }}
+        >
           <span className="absolute top-0 right-0 m-2">
             {copiedScriptToClipboard ? (
               <span title="Copied">
@@ -114,7 +129,7 @@ export default function WebsiteDetailsRoute() {
           </span>
           <code id="script">{script}</code>
         </p>
-        <p className="mt-3">
+        <p className="mt-3 text-sm">
           <Link to="/docs">Need help?</Link>
         </p>
       </div>

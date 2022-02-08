@@ -11,6 +11,9 @@ import { db } from "~/utils/db.server";
 import { requireCurrentUser } from "~/utils/session.server";
 import { generateWebsiteColor, generateWebsiteInitials } from "~/utils/website";
 
+import H2 from "~/components/SectionHeader";
+import LayoutGrid from "~/components/LayoutGrid";
+
 type LoaderData = {
   user: User & {
     orgs: (UserOrg & {
@@ -44,48 +47,48 @@ export default function WebsiteDetailsRoute() {
   return (
     <>
       <div>
-        <h2 className="text-slate-500 text-xs font-medium uppercase tracking-wide">
-          Website Details
-        </h2>
+        <H2>Website Details</H2>
       </div>
-      <div className="mt-3 grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5 4xl:grid-cols-6">
-        <div className="flex">
-          <div
-            className={classNames(
-              generateWebsiteColor(data.website.name),
-              "flex-shrink-0 flex items-center justify-center w-16 text-white text-2xl font-medium rounded-md shadow-sm"
-            )}
-          >
-            {generateWebsiteInitials(data.website.name)}
+      <div className="mt-3">
+        <LayoutGrid>
+          <div className="flex">
+            <div
+              className={classNames(
+                generateWebsiteColor(data.website.name),
+                "flex-shrink-0 flex items-center justify-center w-16 text-white text-2xl font-medium rounded-md shadow-sm"
+              )}
+            >
+              {generateWebsiteInitials(data.website.name)}
+            </div>
+            <div className="ml-2">
+              <label
+                htmlFor="name"
+                className="block text-sm text-left font-medium text-slate-700"
+              >
+                Name
+              </label>
+              <p id="name">{data.website.name}</p>
+            </div>
           </div>
-          <div className="ml-2">
+          <div>
             <label
-              htmlFor="name"
+              htmlFor="link"
               className="block text-sm text-left font-medium text-slate-700"
             >
-              Name
+              Link
             </label>
-            <p id="name">{data.website.name}</p>
+            <a
+              id="link"
+              href={data.website.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-500 hover:text-slate-600 hover:underline flex content-center"
+            >
+              {data.website.url}{" "}
+              <ExternalLinkIcon className="ml-1 mt-1 h-4 w-4" />
+            </a>
           </div>
-        </div>
-        <div>
-          <label
-            htmlFor="link"
-            className="block text-sm text-left font-medium text-slate-700"
-          >
-            Link
-          </label>
-          <a
-            id="link"
-            href={data.website.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-slate-500 hover:text-slate-600 hover:underline flex content-center"
-          >
-            {data.website.url}{" "}
-            <ExternalLinkIcon className="ml-1 mt-1 h-4 w-4" />
-          </a>
-        </div>
+        </LayoutGrid>
       </div>
 
       <div className="mt-3">

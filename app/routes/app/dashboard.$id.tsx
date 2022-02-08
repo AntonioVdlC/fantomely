@@ -181,7 +181,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     filledPeriods.push({
       id: generateRandomString(8),
       value: date,
-      count: Math.ceil(Math.random() * 10),
+      count: 0,
     });
   }
 

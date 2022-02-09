@@ -9,6 +9,7 @@ type Props = {
   label: string;
   placeholder: string;
   defaultValue?: string;
+  disabled?: boolean;
   required?: boolean;
   error?: boolean;
   errorMessage?: string;
@@ -21,6 +22,7 @@ export default function Input({
   label,
   placeholder,
   defaultValue = "",
+  disabled = false,
   required = false,
   error = false,
   errorMessage = "Error. Please check this field again.",
@@ -40,6 +42,7 @@ export default function Input({
           type={type}
           autoComplete={type === "email" ? "email" : ""}
           required={required}
+          disabled={disabled}
           defaultValue={defaultValue}
           aria-invalid={error}
           aria-describedby={`error-message-${id}`}

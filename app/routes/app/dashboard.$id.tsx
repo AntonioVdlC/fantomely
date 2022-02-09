@@ -113,7 +113,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     } else {
       paths.push({
         id: event.pathId,
-        value: event.path.value,
+        value: event.path.value.replace(website.url, ""),
         count: event.count,
       });
     }
@@ -214,9 +214,10 @@ export default function DashboardRoute() {
 
   return data.periods.length ? (
     <>
+      <H2>Dashboard for {data.website.name}</H2>
+      <div className="mt-3"></div>
       <LayoutGrid>
         <div>
-          <H2>Dashboard for {data.website.name}</H2>
           <div className="mt-1 flex">
             <div
               className={classNames(
@@ -328,7 +329,7 @@ export default function DashboardRoute() {
         </div>
         <div>
           <H2>Pages</H2>
-          <div className="mt-1">
+          <div className="mt-1 cursor-pointer">
             {isMounted ? (
               <BarChart
                 key={data.element?.id || data.website.id}
@@ -356,7 +357,7 @@ export default function DashboardRoute() {
         </div>
         <div>
           <H2>Browsers</H2>
-          <div className="mt-1">
+          <div className="mt-1 cursor-pointer">
             {isMounted ? (
               <BarChart
                 key={data.element?.id || data.website.id}
@@ -384,7 +385,7 @@ export default function DashboardRoute() {
         </div>
         <div>
           <H2>Platforms</H2>
-          <div className="mt-1">
+          <div className="mt-1 cursor-pointer">
             {isMounted ? (
               <BarChart
                 key={data.element?.id || data.website.id}

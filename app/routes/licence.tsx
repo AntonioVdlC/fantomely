@@ -3,9 +3,6 @@ import { useLoaderData } from "remix";
 
 import Footer from "~/components/Footer";
 import Header from "~/components/Header";
-import LandingCTA from "~/components/LandingCTA";
-import LandingFeatures from "~/components/LandingFeatures";
-import LandingHero from "~/components/LandingHero";
 
 import { getUserId } from "~/utils/session.server";
 
@@ -28,10 +25,8 @@ export default function LandingScreen() {
     <div className="relative bg-slate-50">
       <Header isUserLoggedIn={data.isUserLoggedIn} />
 
-      <main>
-        <LandingHero />
-        <LandingFeatures />
-        <LandingCTA />
+      <main className="mx-auto max-w-7xl px-8">
+        <p>Licence</p>
       </main>
 
       <Footer />

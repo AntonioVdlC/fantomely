@@ -4,7 +4,7 @@ import Button from "~/components/Button";
 
 export default function LandingCTA() {
   return (
-    <div className="relative mt-24 sm:mt-32 sm:py-16">
+    <div className="relative sm:py-16">
       <div aria-hidden="true" className="hidden sm:block">
         <div className="absolute inset-y-0 left-0 w-1/2 bg-slate-100 rounded-r-3xl" />
         <svg

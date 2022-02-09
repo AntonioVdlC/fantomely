@@ -1,14 +1,59 @@
 import type { FC } from "react";
 
-type Props = {
-  features: Array<{ name: string; description: string; Icon: FC<any> }>;
-};
+import {
+  AdjustmentsIcon,
+  EyeOffIcon,
+  LightningBoltIcon,
+  PresentationChartLineIcon,
+  ScaleIcon,
+  ShieldCheckIcon,
+} from "@heroicons/react/outline";
 
-export default function LandingFeatures({ features }: Props) {
+export default function LandingFeatures() {
+  const features: Array<{ name: string; description: string; Icon: FC<any> }> =
+    [
+      {
+        name: "Private by design",
+        description:
+          "We only store aggregate data from your users' behavior on your website, which makes our analytics private by design.",
+        Icon: EyeOffIcon,
+      },
+      {
+        name: "Cookie-free",
+        description:
+          "We are not tracking your users individually, which means no cookie banners needed, but more cookies for you!",
+        Icon: ShieldCheckIcon,
+      },
+      {
+        name: "Blazing fast",
+        description:
+          "Our analytics script is a handful of lines, and weights less than 1Kb. We kept nothing but the essentials!",
+        Icon: LightningBoltIcon,
+      },
+      {
+        name: "Open source",
+        description:
+          "All the code (including this very page) is open source and can be independently audited and freely self-hosted.",
+        Icon: ScaleIcon,
+      },
+      {
+        name: "Powerful analytics",
+        description:
+          "We provide meaningful analytics while protecting your users' privacy. Who said you can't have both?",
+        Icon: PresentationChartLineIcon,
+      },
+      {
+        name: "Easy integration",
+        description:
+          "Integrate our script on any website or web app with a single line of code. That's it, you're good to go!",
+        Icon: AdjustmentsIcon,
+      },
+    ];
+
   return (
     <div className="relative bg-slate-50 py-16 sm:py-24 lg:py-32">
       <div className="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:px-8 lg:max-w-7xl">
-        <h2 className="text-base font-semibold tracking-wider text-slate-600 uppercase">
+        <h2 className="text-base font-semibold tracking-wider text-slate-500 uppercase">
           Private by design
         </h2>
         <p className="mt-2 text-3xl font-extrabold text-slate-900 tracking-tight sm:text-4xl">

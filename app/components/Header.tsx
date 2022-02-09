@@ -9,11 +9,16 @@ import Button from "~/components/Button";
 import Logo from "~/components/Logo";
 
 type Props = {
-  navigation: Array<{ name: string; href: string }>;
   isUserLoggedIn: boolean;
 };
 
-export default function Header({ navigation, isUserLoggedIn }: Props) {
+export default function Header({ isUserLoggedIn }: Props) {
+  const navigation = [
+    { name: "Docs", href: "/docs" },
+    { name: "Pricing", href: "/pricing" },
+    { name: "Contribute", href: "/contribute" },
+  ];
+
   return (
     <Popover
       as="header"

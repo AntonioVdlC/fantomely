@@ -1,11 +1,24 @@
 import FooterSocial, { SocialPlatform } from "~/components/FooterSocial";
 
-type Props = {
-  navigation: Array<{ name: string; href: string }>;
-  social: Array<{ name: SocialPlatform; href: string }>;
-};
+export default function Footer() {
+  const navigation = [
+    { name: "About", href: "/about" },
+    { name: "Docs", href: "/docs" },
+    { name: "Pricing", href: "/pricing" },
+    { name: "Terms", href: "/terms" },
+    { name: "Licence", href: "/licence" },
+  ];
+  const social: Array<{ name: SocialPlatform; href: string }> = [
+    {
+      name: "twitter",
+      href: "https://twitter.com",
+    },
+    {
+      name: "github",
+      href: "https://github.com/",
+    },
+  ];
 
-export default function Footer({ navigation, social }: Props) {
   return (
     <footer className="mt-24 bg-slate-900 sm:mt-12">
       <div className="mx-auto max-w-md py-12 px-4 overflow-hidden sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
@@ -32,7 +45,15 @@ export default function Footer({ navigation, social }: Props) {
           ))}
         </div>
         <p className="mt-8 text-center text-base text-slate-400">
-          &copy; {new Date().getFullYear()}. All rights reserved.
+          Made with <span className="text-slate-300">&hearts;</span> by{" "}
+          <a
+            className="hover:underline "
+            href="https://antoniovdlc.me"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Antonio Villagra De La Cruz
+          </a>
         </p>
       </div>
     </footer>

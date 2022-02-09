@@ -58,13 +58,6 @@ export default function ErrorPage({
               className="inline-block border-l border-slate-300"
               aria-hidden="true"
             />
-            <Link to="/status" className="text-sm font-medium">
-              Status
-            </Link>
-            <span
-              className="inline-block border-l border-slate-300"
-              aria-hidden="true"
-            />
             <Link to="https://twitter.com" className="text-sm font-medium">
               Twitter
             </Link>

@@ -1,4 +1,4 @@
-import type { MetaFunction } from "remix";
+import { LoaderFunction, MetaFunction, redirect } from "remix";
 import { Links, LiveReload, Outlet, Meta, Scripts } from "remix";
 import { useCatch } from "remix";
 
@@ -7,6 +7,30 @@ import errors, { defaultError } from "~/utils/errors";
 import styles from "./tailwind.css";
 import favicon from "~/assets/favicon.png";
 import ErrorPage from "~/components/ErrorPage";
+
+export const loader: LoaderFunction = ({ request }) => {
+  // upgrade people to https automatically
+  // https://github.com/remix-run/remix-jokes/blob/8f786d9d7fa7ea62203e87c1e0bdaa9bda3b28af/app/root.tsx#L25-L46
+
+  const url = new URL(request.url);
+  const hostname = url.hostname;
+  const proto = request.headers.get("X-Forwarded-Proto") ?? url.protocol;
+
+  url.host =
+    request.headers.get("X-Forwarded-Host") ??
+    request.headers.get("host") ??
+    url.host;
+  url.protocol = "https:";
+
+  if (proto === "http" && hostname !== "localhost") {
+    return redirect(url.toString(), {
+      headers: {
+        "X-Forwarded-Proto": "https",
+      },
+    });
+  }
+  return {};
+};
 
 export function links() {
   return [

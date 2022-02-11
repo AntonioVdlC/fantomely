@@ -21,14 +21,14 @@ export const meta: MetaFunction = () => {
   return {
     description,
     keywords: "privacy, web analytics, analytics",
-    "og:title": "Fantomely",
+    "og:title": "fantomely",
     "og:description": description,
   };
 };
 
 function Document({
   children,
-  title = `Fantomely | Privacy-First Web Analytics`,
+  title = `fantomely | Privacy-First Web Analytics`,
 }: {
   children: React.ReactNode;
   title?: string;

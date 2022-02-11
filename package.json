@@ -17,13 +17,14 @@
     "build:css": "tailwindcss -i ./styles/tailwind.css -o ./app/tailwind.css --minify",
     "dev": "npm run build:sdk && concurrently \"npm run dev:css\" \"remix dev\"",
     "dev:css": "tailwindcss -i ./styles/tailwind.css -o ./app/tailwind.css --watch",
+    "db:migrate": "prisma migrate deploy",
     "pre-commit": "lint-staged",
     "lint": "npm run lint:app && npm run lint:prisma && npm run lint:sdk",
     "lint:app": "eslint app/**/*.{ts,tsx}",
     "lint:prisma": "eslint prisma/*.ts",
     "lint:sdk": "eslint sdk/src/*.ts",
     "postinstall": "remix setup node",
-    "start": "remix-serve build",
+    "start": "npm run db:migrate && remix-serve build",
     "prepare": "husky install"
   },
   "dependencies": {

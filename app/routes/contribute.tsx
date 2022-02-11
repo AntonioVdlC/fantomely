@@ -111,7 +111,11 @@ export default function LandingScreen() {
               </p>
               <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
                 <div>
-                  <Button to="https://github.com" external primary>
+                  <Button
+                    to="https://github.com/AntonioVdlC/analytics-service"
+                    external
+                    primary
+                  >
                     Contribute
                   </Button>
                 </div>

@@ -11,11 +11,11 @@ export default function Footer() {
   const social: Array<{ name: SocialPlatform; href: string }> = [
     {
       name: "twitter",
-      href: "https://twitter.com",
+      href: "https://twitter.com/fantome_ly",
     },
     {
       name: "github",
-      href: "https://github.com/",
+      href: "https://github.com/AntonioVdlC/analytics-service",
     },
   ];
 

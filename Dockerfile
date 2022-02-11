@@ -13,6 +13,12 @@ WORKDIR /app
 ADD package.json package-lock.json ./
 RUN npm install --production=false
 
+RUN mkdir /sdk
+WORKDIR /sdk
+
+ADD package.json package-lock.json ./
+RUN npm install --production=false
+
 # Setup production node_modules
 FROM base as production-deps
 
@@ -20,6 +26,13 @@ RUN mkdir /app
 WORKDIR /app
 
 COPY --from=deps /app/node_modules /app/node_modules
+ADD package.json package-lock.json ./
+RUN npm prune --production
+
+RUN mkdir /sdk
+WORKDIR /sdk
+
+COPY --from=deps /app/sdk/node_modules /app/sdk/node_modules
 ADD package.json package-lock.json ./
 RUN npm prune --production
 
@@ -32,6 +45,7 @@ RUN mkdir /app
 WORKDIR /app
 
 COPY --from=deps /app/node_modules /app/node_modules
+COPY --from=deps /app/sdk/node_modules /app/sdk/node_modules
 
 # If we're using Prisma, uncomment to cache the prisma schema
 ADD prisma .

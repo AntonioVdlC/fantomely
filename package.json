@@ -11,7 +11,7 @@
     "email": ""
   },
   "scripts": {
-    "build": "npm run build:sdk && npm run build:css && remix build",
+    "build": "npm run build:css && remix build && npm run build:sdk",
     "prebuild:sdk": "rm -rf ./public/sdk && mkdir ./public/sdk",
     "build:sdk": "cd ./sdk && npm run build && cd .. && cp ./sdk/dist/browser.js ./public/sdk/browser.js",
     "build:css": "tailwindcss -i ./styles/tailwind.css -o ./app/tailwind.css --minify",

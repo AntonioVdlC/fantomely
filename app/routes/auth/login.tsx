@@ -15,6 +15,7 @@ import Button from "~/components/Button";
 import Logo from "~/components/Logo";
 
 import illustration from "~/assets/illustration_login.svg";
+import { send } from "~/utils/email.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await getUserId(request);
@@ -72,13 +73,30 @@ export const action: ActionFunction = async ({ request }) => {
     });
   }
 
-  // TODO: send email
-  // eslint-disable-next-line no-console
-  console.log(
-    `/auth/login/callback?email=${email}&token=${magicLink.token}&redirectTo=${redirectTo}`
-  );
+  // Send magic link
+  try {
+    await send({
+      from: "fantomely <no-reply@fantomely.com>",
+      to: email,
+      subject: "Log into fantomely",
+      text: `Log into fantomely!
+          Here is your magic link to log into your fantomely account: ${
+            new URL(request.url).origin
+          }/auth/login/callback?email=${encodeURIComponent(email)}&token=${
+        magicLink.token
+      }&redirectTo=${redirectTo}`,
+    });
+  } catch (error: any) {
+    // eslint-disable-next-line no-console
+    console.log(error);
+    throw new Error(error);
+  }
 
-  return redirect(`/auth/login/sent?email=${email}&redirectTo=${redirectTo}`);
+  return redirect(
+    `/auth/login/sent?email=${encodeURIComponent(
+      email
+    )}&redirectTo=${redirectTo}`
+  );
 };
 
 export default function Login() {

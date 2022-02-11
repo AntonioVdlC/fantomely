@@ -39,6 +39,18 @@ export async function generateMagicLink(email: string) {
     data: { token, userId: user.id, validUntil },
   });
 
+  // Invalidate past magic links
+  const now = new Date();
+  await db.magicLink.updateMany({
+    data: { validUntil: now },
+    where: {
+      id: { not: magicLink.id },
+      userId: user.id,
+      isUsed: false,
+      validUntil: { gte: now },
+    },
+  });
+
   return magicLink;
 }
 
@@ -84,7 +96,11 @@ export async function joinWaitlist({ email }: JoinWaitlistForm) {
 
 export async function loginWaitlist({ email, token }: LoginForm) {
   const user = await db.user.findFirst({
-    where: { email, waitlistToken: token, isInWaitlist: true },
+    where: {
+      email,
+      waitlistToken: token,
+      isInWaitlist: true,
+    },
     include: { orgs: { include: { org: true } } },
   });
 

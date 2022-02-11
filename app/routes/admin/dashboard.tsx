@@ -7,6 +7,7 @@ import {
   useLoaderData,
 } from "remix";
 import { db } from "~/utils/db.server";
+import { send } from "~/utils/email.server";
 import {
   generateRandomString,
   requireAdminSession,
@@ -64,13 +65,24 @@ export const action: ActionFunction = async ({ request }) => {
       await db.user.update({ data: { waitlistToken }, where: { id: user.id } });
 
       // Send invite link
-      // TODO
-      // eslint-disable-next-line no-console
-      console.log(
-        `emailto: ${user.email}`,
-        `/auth/waitlist/callback?email=${user.email}&token=${waitlistToken}`
-      );
+      try {
+        await send({
+          to: user.email,
+          subject: "Welcome to Fantomely",
+          text: `Welcome to Fantomely!
+          You can now finish your registration using the following link: ${
+            new URL(request.url).origin
+          }/auth/waitlist/callback?email=${encodeURIComponent(
+            user.email
+          )}&token=${waitlistToken}`,
+        });
+      } catch (error: any) {
+        // eslint-disable-next-line no-console
+        console.log(error);
+        throw new Error(error);
+      }
 
+      // Update user
       await db.user.update({
         data: {
           waitlistInviteSent: true,

@@ -72,7 +72,7 @@ export const action: ActionFunction = async ({ request }) => {
     });
   }
 
-  return redirect(`/auth/waitlist/sent?email=${email}`);
+  return redirect(`/auth/waitlist/sent?email=${encodeURIComponent(email)}`);
 };
 
 export default function RegisterRoute() {

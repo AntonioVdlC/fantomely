@@ -25,7 +25,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     });
   }
 
-  const user = await login({ email, token });
+  const user = await login({ email: decodeURIComponent(email), token });
 
   if (!user) {
     throw new Response("Oops, we can't find you ...", {

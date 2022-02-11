@@ -28,7 +28,7 @@ export default function LoginSentRoute() {
         <p className="mt-3">
           We will send you an email to{" "}
           <span className="text-slate-700 font-bold">
-            {searchParams.get("email")}
+            {decodeURIComponent(searchParams.get("email") || "")}
           </span>{" "}
           to finish your registration once we open up to more users.
         </p>

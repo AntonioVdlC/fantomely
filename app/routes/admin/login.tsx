@@ -5,6 +5,8 @@ import {
   generateRandomString,
 } from "~/utils/session.server";
 
+import { send } from "~/utils/email.server";
+
 type ActionData = {
   tokenSent: boolean;
 };
@@ -23,9 +25,24 @@ export const action: ActionFunction = async ({ request }) => {
         },
       });
 
-      // TODO: send to ADMIN_EMAIL
-      // eslint-disable-next-line no-console
-      console.log(`emailto: ${process.env.ADMIN_EMAIL}`, token.value);
+      if (
+        typeof process.env.ADMIN_EMAIL !== "string" ||
+        !process.env.ADMIN_EMAIL
+      ) {
+        throw new Error("No email provided");
+      }
+
+      try {
+        await send({
+          to: process.env.ADMIN_EMAIL,
+          subject: "Login to Admin Dashboard",
+          text: token.value,
+        });
+      } catch (error: any) {
+        // eslint-disable-next-line no-console
+        console.log(error);
+        throw new Error(error);
+      }
 
       return { tokenSent: true };
     }

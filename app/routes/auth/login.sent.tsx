@@ -31,7 +31,7 @@ export default function LoginSentRoute() {
         <p>
           An email has been sent to{" "}
           <span className="text-slate-700 font-bold">
-            {searchParams.get("email")}
+            {decodeURIComponent(searchParams.get("email") || "")}
           </span>
           .
         </p>

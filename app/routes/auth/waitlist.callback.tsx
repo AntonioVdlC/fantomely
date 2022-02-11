@@ -28,7 +28,10 @@ export const loader: LoaderFunction = async ({ request }) => {
     });
   }
 
-  const user = await loginWaitlist({ email, token });
+  const user = await loginWaitlist({
+    email: decodeURIComponent(email),
+    token,
+  });
 
   if (!user) {
     throw new Response("Oops, we can't find you ...", {

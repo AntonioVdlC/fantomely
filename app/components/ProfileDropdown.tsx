@@ -2,7 +2,7 @@ import { Menu, Transition } from "@headlessui/react";
 import { User } from "@prisma/client";
 import { Fragment } from "react";
 import classNames from "~/utils/class-names";
-import UserLetterAvatar from "./USerLetterAvatar";
+import UserLetterAvatar from "./UserLetterAvatar";
 
 type Props = {
   user: User;

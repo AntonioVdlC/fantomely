@@ -64,6 +64,16 @@ function Document({
         <Meta />
         <title>{title}</title>
         <Links />
+        {/* fantomely on fantomely */}
+        {process.env.NODE_ENV === "production" ? (
+          <script
+            defer
+            src="https://fantomely.com/sdk/browser.js"
+            data-fantomely
+            data-h="https://fantomely.com"
+            data-k="c3d877bf99ed0e0e3df4cea98e1273a38966b7c6dc53b670051250bcfc88016c"
+          ></script>
+        ) : null}
       </head>
       <body className="h-full text-slate-900">
         {children}

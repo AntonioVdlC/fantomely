@@ -13,10 +13,10 @@ WORKDIR /app
 ADD package.json package-lock.json ./
 RUN npm install --production=false
 
-RUN mkdir /sdk
-WORKDIR /sdk
+RUN mkdir /app/sdk
+WORKDIR /app/sdk
 
-ADD package.json package-lock.json ./
+ADD ./sdk/package.json ./sdk/package-lock.json ./
 RUN npm install --production=false
 
 # Setup production node_modules
@@ -29,11 +29,11 @@ COPY --from=deps /app/node_modules /app/node_modules
 ADD package.json package-lock.json ./
 RUN npm prune --production
 
-RUN mkdir /sdk
-WORKDIR /sdk
+RUN mkdir /app/sdk
+WORKDIR /app/sdk
 
 COPY --from=deps /app/sdk/node_modules /app/sdk/node_modules
-ADD package.json package-lock.json ./
+ADD ./sdk/package.json ./sdk/package-lock.json ./
 RUN npm prune --production
 
 # Build the app

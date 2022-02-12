@@ -1,15 +1,11 @@
-import { ChevronRightIcon } from "@heroicons/react/outline";
-import { HomeIcon } from "@heroicons/react/solid";
-import { Website } from "@prisma/client";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "remix";
+import { ChevronRightIcon } from "@heroicons/react/outline";
+import { HomeIcon } from "@heroicons/react/solid";
 
-// https://stackoverflow.com/a/38191078
-function isUUID(str: string) {
-  return /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i.test(
-    str
-  );
-}
+import type { Website } from "@prisma/client";
+
+import isUUID from "~/utils/is-uuid";
 
 type CrumbItem = {
   name: string;
@@ -63,7 +59,7 @@ export default function Breadcrumbs({ websites }: Props) {
         <li>
           <div>
             <Link to="/app" className="text-gray-400 hover:text-gray-500">
-              <HomeIcon className="flex-shrink-0 h-5 w-5" aria-hidden="true" />
+              <HomeIcon className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
               <span className="sr-only">Home</span>
             </Link>
           </div>
@@ -72,12 +68,12 @@ export default function Breadcrumbs({ websites }: Props) {
           <li key={page.name}>
             <div className="flex items-center">
               <ChevronRightIcon
-                className="flex-shrink-0 h-5 w-5 text-gray-400"
+                className="h-5 w-5 flex-shrink-0 text-gray-400"
                 aria-hidden="true"
               />
               <Link
                 to={page.href}
-                className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700 uppercase"
+                className="ml-4 text-sm font-medium uppercase text-gray-500 hover:text-gray-700"
                 aria-current={page.current ? "page" : undefined}
               >
                 {page.name}

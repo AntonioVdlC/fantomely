@@ -1,5 +1,7 @@
-import { LoaderFunction, useCatch } from "remix";
-import { redirect } from "remix";
+import { redirect, useCatch } from "remix";
+
+import type { LoaderFunction } from "remix";
+
 import ErrorPage from "~/components/ErrorPage";
 import Loading from "~/components/Loading";
 

@@ -3,7 +3,7 @@ import { Outlet } from "remix";
 export default function AuthRoute() {
   return (
     <>
-      <div className="h-screen bg-slate-50 flex flex-col justify-center items-center overflow-hidden">
+      <div className="flex h-screen flex-col items-center justify-center overflow-hidden bg-slate-50">
         <Outlet />
       </div>
     </>

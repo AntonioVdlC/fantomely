@@ -1,4 +1,5 @@
-import { User } from "@prisma/client";
+import type { User } from "@prisma/client";
+
 import classNames from "~/utils/class-names";
 
 export function generateAvatarColor(user: User | undefined) {
@@ -53,7 +54,7 @@ export default function UserLetterAvatar({ user }: Props) {
     <span
       className={classNames(
         generateAvatarColor(user),
-        "inline-flex items-center justify-center h-8 w-8 rounded-full bg-slate-500"
+        "inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-500"
       )}
     >
       <span className="text-sm font-medium leading-none text-white">

@@ -32,7 +32,7 @@ export default function Input({
       <div>
         <label
           htmlFor={id}
-          className="block text-sm text-left font-medium text-slate-700"
+          className="block text-left text-sm font-medium text-slate-700"
         >
           {label}
         </label>
@@ -47,7 +47,7 @@ export default function Input({
           aria-invalid={error}
           aria-describedby={`error-message-${id}`}
           placeholder={placeholder}
-          className="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-slate-500 focus:border-slate-500 sm:text-sm"
+          className="block w-full appearance-none rounded-md border border-slate-300 px-3 py-2 placeholder-slate-400 shadow-sm focus:border-slate-500 focus:outline-none focus:ring-slate-500 sm:text-sm"
         />
         {error ? (
           <p

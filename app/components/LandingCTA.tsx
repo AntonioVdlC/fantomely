@@ -6,7 +6,7 @@ export default function LandingCTA() {
   return (
     <div className="relative sm:py-16">
       <div aria-hidden="true" className="hidden sm:block">
-        <div className="absolute inset-y-0 left-0 w-1/2 bg-slate-100 rounded-r-3xl" />
+        <div className="absolute inset-y-0 left-0 w-1/2 rounded-r-3xl bg-slate-100" />
         <svg
           className="absolute top-8 left-1/2 -ml-3"
           width={404}
@@ -41,7 +41,7 @@ export default function LandingCTA() {
         </svg>
       </div>
       <div className="mx-auto max-w-md px-4 sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
-        <div className="relative rounded-2xl px-6 py-10 bg-slate-500 overflow-hidden shadow-xl sm:px-12 sm:py-20">
+        <div className="relative overflow-hidden rounded-2xl bg-slate-500 px-6 py-10 shadow-xl sm:px-12 sm:py-20">
           <div
             aria-hidden="true"
             className="absolute inset-0 -mt-72 sm:-mt-32 md:mt-0"
@@ -67,10 +67,10 @@ export default function LandingCTA() {
           </div>
           <div className="relative">
             <div className="sm:text-center">
-              <h2 className="text-3xl font-extrabold text-white tracking-tight sm:text-4xl">
+              <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
                 Get notified when we're launching.
               </h2>
-              <p className="mt-6 mx-auto max-w-2xl text-lg text-slate-100">
+              <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-100">
                 Join our waitlist and get an invite when we launch our private
                 beta. By providing your email, you agree to our{" "}
                 <Link
@@ -85,7 +85,7 @@ export default function LandingCTA() {
             <form
               method="post"
               action="/auth/waitlist"
-              className="mt-12 sm:mx-auto sm:max-w-lg sm:flex"
+              className="mt-12 sm:mx-auto sm:flex sm:max-w-lg"
             >
               <div className="min-w-0 flex-1">
                 <label htmlFor="cta-email" className="sr-only">
@@ -96,7 +96,7 @@ export default function LandingCTA() {
                   name="email"
                   type="email"
                   required
-                  className="block w-full px-4 py-3 rounded-md border-0 text-base text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-300 focus:ring-offset-slate-900"
+                  className="block w-full rounded-md border-0 px-4 py-3 text-base text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2 focus:ring-offset-slate-900"
                   placeholder="Enter your email"
                 />
               </div>

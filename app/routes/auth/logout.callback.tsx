@@ -1,10 +1,11 @@
 import { Link } from "remix";
+
 import Logo from "~/components/Logo";
 
 export default function LogoutCallbackRouter() {
   return (
     <>
-      <div className="flex justify-center animate-pulse">
+      <div className="flex animate-pulse justify-center">
         <Logo size="lg" withLink />
       </div>
 

@@ -1,17 +1,15 @@
+import { Form, json, useLoaderData } from "remix";
+
+import type { ActionFunction, LoaderFunction } from "remix";
+import type { User } from "@prisma/client";
+
+import { db } from "~/utils/db.server";
+import { requireCurrentUser } from "~/utils/session.server";
+
 import H2 from "~/components/SectionHeader";
 import LayoutGrid from "~/components/LayoutGrid";
 import Input from "~/components/Input";
-import {
-  ActionFunction,
-  Form,
-  json,
-  LoaderFunction,
-  useLoaderData,
-} from "remix";
-import { requireCurrentUser } from "~/utils/session.server";
-import { User } from "@prisma/client";
 import Button from "~/components/Button";
-import { db } from "~/utils/db.server";
 
 type LoaderData = {
   user: User;

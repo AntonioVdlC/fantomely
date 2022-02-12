@@ -1,14 +1,17 @@
-import { Website } from "@prisma/client";
-import { LoaderFunction, redirect, useLoaderData } from "remix";
+import { redirect, useLoaderData } from "remix";
+
+import type { LoaderFunction } from "remix";
+import type { Website } from "@prisma/client";
+
 import { db } from "~/utils/db.server";
 import { requireCurrentUser } from "~/utils/session.server";
-
-import DashboardSection from "~/components/DashboardSection";
 import {
   getPageViewsLastDay,
   getPageViewsLastHour,
   getPageViewsLastMonth,
 } from "~/utils/stats.server";
+
+import DashboardSection from "~/components/DashboardSection";
 
 type PageViewsItem = {
   value: {

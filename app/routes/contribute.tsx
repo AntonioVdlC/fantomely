@@ -1,11 +1,12 @@
-import { Link, LoaderFunction } from "remix";
-import { useLoaderData } from "remix";
-import Button from "~/components/Button";
+import { Link, useLoaderData } from "remix";
 
-import Footer from "~/components/Footer";
-import Header from "~/components/Header";
+import type { LoaderFunction } from "remix";
 
 import { getUserId } from "~/utils/session.server";
+
+import Button from "~/components/Button";
+import Footer from "~/components/Footer";
+import Header from "~/components/Header";
 
 type LoaderData = {
   isUserLoggedIn: boolean;
@@ -26,14 +27,14 @@ export default function LandingScreen() {
     <div className="relative bg-slate-50">
       <Header isUserLoggedIn={data.isUserLoggedIn} />
 
-      <div className="relative bg-slate-50 overflow-hidden">
+      <div className="relative overflow-hidden bg-slate-50">
         <div
-          className="hidden sm:block sm:absolute sm:inset-y-0 sm:h-full sm:w-full"
+          className="hidden sm:absolute sm:inset-y-0 sm:block sm:h-full sm:w-full"
           aria-hidden="true"
         >
-          <div className="relative h-full max-w-7xl mx-auto">
+          <div className="relative mx-auto h-full max-w-7xl">
             <svg
-              className="absolute right-full transform translate-y-1/4 translate-x-1/4 lg:translate-x-1/2"
+              className="absolute right-full translate-y-1/4 translate-x-1/4 transform lg:translate-x-1/2"
               width={404}
               height={784}
               fill="none"
@@ -65,7 +66,7 @@ export default function LandingScreen() {
               />
             </svg>
             <svg
-              className="absolute left-full transform -translate-y-3/4 -translate-x-1/4 md:-translate-y-1/2 lg:-translate-x-1/2"
+              className="absolute left-full -translate-y-3/4 -translate-x-1/4 transform md:-translate-y-1/2 lg:-translate-x-1/2"
               width={404}
               height={784}
               fill="none"
@@ -100,16 +101,16 @@ export default function LandingScreen() {
         </div>
 
         <div className="relative pt-6 pb-16 sm:pb-24">
-          <main className="mt-16 mx-auto max-w-7xl px-4 sm:mt-24">
+          <main className="mx-auto mt-16 max-w-7xl px-4 sm:mt-24">
             <div className="text-center">
-              <h1 className="text-4xl tracking-tight font-extrabold text-slate-900 sm:text-5xl md:text-6xl">
+              <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl md:text-6xl">
                 <span className="block xl:inline">Contribute</span>
               </h1>
-              <p className="mt-3 max-w-md mx-auto text-base text-slate-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+              <p className="mx-auto mt-3 max-w-md text-base text-slate-500 sm:text-lg md:mt-5 md:max-w-3xl md:text-xl">
                 The platform is open source, and very welcoming of
                 contributions!
               </p>
-              <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
+              <div className="mx-auto mt-5 max-w-md sm:flex sm:justify-center md:mt-8">
                 <div>
                   <Button
                     to="https://github.com/AntonioVdlC/analytics-service"
@@ -121,17 +122,17 @@ export default function LandingScreen() {
                 </div>
               </div>
 
-              <hr className="mt-8 md:mt-12 max-w-md mx-auto " />
+              <hr className="mx-auto mt-8 max-w-md md:mt-12 " />
 
-              <p className="mt-8 max-w-md mx-auto text-base text-slate-500 sm:text-lg md:mt-12 md:text-xl md:max-w-3xl">
+              <p className="mx-auto mt-8 max-w-md text-base text-slate-500 sm:text-lg md:mt-12 md:max-w-3xl md:text-xl">
                 As we are currently in private beta, you can also contribute by
                 joining the waitlist and testing the platform.
               </p>
-              <div className="mt-3 text-center flex flex-col items-center">
+              <div className="mt-3 flex flex-col items-center text-center">
                 <form
                   method="post"
                   action="/auth/waitlist"
-                  className="sm:max-w-xl sm:mx-auto lg:mx-0"
+                  className="sm:mx-auto sm:max-w-xl lg:mx-0"
                 >
                   <div className="sm:flex">
                     <div className="min-w-0 flex-1">
@@ -144,7 +145,7 @@ export default function LandingScreen() {
                         name="email"
                         required
                         placeholder="Enter your email"
-                        className="block w-full px-4 py-3 rounded-md text-base text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-300 focus:ring-offset-slate-900  border border-slate-300"
+                        className="block w-full rounded-md border border-slate-300 px-4 py-3 text-base text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-300  focus:ring-offset-2 focus:ring-offset-slate-900"
                       />
                     </div>
                     <div className="mt-3 sm:mt-0 sm:ml-3">

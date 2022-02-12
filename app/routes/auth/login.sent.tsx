@@ -30,7 +30,7 @@ export default function LoginSentRoute() {
         ) : null}
         <p>
           An email has been sent to{" "}
-          <span className="text-slate-700 font-bold">
+          <span className="font-bold text-slate-700">
             {decodeURIComponent(searchParams.get("email") || "")}
           </span>
           .
@@ -38,7 +38,7 @@ export default function LoginSentRoute() {
         <p className="mt-3">
           Can't find the email? Try{" "}
           <Link
-            to={`/login?redirectTo=${searchParams.get("redirectTo")}`}
+            to={`/auht/login?redirectTo=${searchParams.get("redirectTo")}`}
             className="font-medium text-slate-700 hover:text-slate-900"
           >
             signing in

@@ -1,13 +1,15 @@
-import type { ActionFunction, LoaderFunction } from "remix";
 import { Form, json, redirect, useActionData } from "remix";
-
 import { Role } from "@prisma/client";
+
+import type { ActionFunction, LoaderFunction } from "remix";
+
 import { db } from "~/utils/db.server";
 import {
   getUser,
   requireValidSession,
   setCurrentOrg,
 } from "~/utils/session.server";
+
 import Button from "~/components/Button";
 import Logo from "~/components/Logo";
 
@@ -105,10 +107,10 @@ export default function OnboardingOrgCreationRoute() {
   return (
     <>
       <div className="w-screen">
-        <div className="pt-10 bg-slate-50 sm:pt-16 lg:pt-8 lg:pb-14 lg:overflow-hidden">
+        <div className="bg-slate-50 pt-10 sm:pt-16 lg:overflow-hidden lg:pt-8 lg:pb-14">
           <div className="mx-auto max-w-7xl px-8">
             <div className="lg:grid lg:grid-cols-2 lg:gap-8">
-              <div className="mx-auto max-w-sm px-4 sm:px-6 sm:text-center lg:px-0 lg:text-left lg:flex lg:items-center">
+              <div className="mx-auto max-w-sm px-4 sm:px-6 sm:text-center lg:flex lg:items-center lg:px-0 lg:text-left">
                 <div className="lg:py-24">
                   <div className="flex justify-center">
                     <Logo size="lg" withLink />
@@ -141,7 +143,7 @@ export default function OnboardingOrgCreationRoute() {
                           type="text"
                           required
                           placeholder="Jane"
-                          className="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-slate-500 focus:border-slate-500 sm:text-sm"
+                          className="block w-full appearance-none rounded-md border border-slate-300 px-3 py-2 placeholder-slate-400 shadow-sm focus:border-slate-500 focus:outline-none focus:ring-slate-500 sm:text-sm"
                           aria-invalid={
                             Boolean(actionData?.fieldErrors?.firstName) ||
                             undefined
@@ -176,7 +178,7 @@ export default function OnboardingOrgCreationRoute() {
                           type="text"
                           required
                           placeholder="Doe"
-                          className="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-slate-500 focus:border-slate-500 sm:text-sm"
+                          className="block w-full appearance-none rounded-md border border-slate-300 px-3 py-2 placeholder-slate-400 shadow-sm focus:border-slate-500 focus:outline-none focus:ring-slate-500 sm:text-sm"
                           aria-invalid={
                             Boolean(actionData?.fieldErrors?.lastName) ||
                             undefined
@@ -227,7 +229,7 @@ export default function OnboardingOrgCreationRoute() {
                   </div>
                 </div>
               </div>
-              <div className="mt-12 hidden lg:block lg:m-0 lg:relative">
+              <div className="mt-12 hidden lg:relative lg:m-0 lg:block">
                 <div className="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6  lg:px-0">
                   <img
                     className="w-full lg:absolute lg:inset-y-0 lg:left-0 lg:h-full "

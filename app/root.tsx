@@ -1,12 +1,22 @@
-import { LoaderFunction, MetaFunction, redirect } from "remix";
-import { Links, LiveReload, Outlet, Meta, Scripts } from "remix";
-import { useCatch } from "remix";
+import {
+  Links,
+  LiveReload,
+  Outlet,
+  Meta,
+  Scripts,
+  redirect,
+  useCatch,
+} from "remix";
+
+import type { LoaderFunction, MetaFunction } from "remix";
 
 import errors, { defaultError } from "~/utils/errors";
 
-import styles from "./tailwind.css";
-import favicon from "~/assets/favicon.png";
 import ErrorPage from "~/components/ErrorPage";
+
+import styles from "./tailwind.css";
+
+import favicon from "~/assets/favicon.png";
 
 export const loader: LoaderFunction = ({ request }) => {
   // upgrade people to https automatically

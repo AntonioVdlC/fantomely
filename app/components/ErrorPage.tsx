@@ -1,4 +1,5 @@
 import { Link } from "remix";
+
 import Logo from "~/components/Logo";
 
 type Props = {
@@ -19,10 +20,10 @@ export default function ErrorPage({
 }: Props) {
   return (
     <>
-      <div className="min-h-full pt-16 pb-12 flex flex-col bg-slate-50">
-        <main className="flex-grow flex flex-col justify-center max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex min-h-full flex-col bg-slate-50 pt-16 pb-12">
+        <main className="mx-auto flex w-full max-w-7xl flex-grow flex-col justify-center px-4 sm:px-6 lg:px-8">
           <div
-            className={`flex-shrink-0 flex justify-center ${
+            className={`flex flex-shrink-0 justify-center ${
               status === 404 ? "animate-pulse" : ""
             }`}
           >
@@ -30,10 +31,10 @@ export default function ErrorPage({
           </div>
           <div className="py-16">
             <div className="text-center">
-              <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide">
+              <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">
                 {status} error
               </p>
-              <h1 className="mt-2 text-4xl font-extrabold text-slate-900 tracking-tight sm:text-5xl">
+              <h1 className="mt-2 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
                 {title}
               </h1>
               <p className="mt-2 text-base text-slate-500">{description}</p>
@@ -46,7 +47,7 @@ export default function ErrorPage({
             </div>
           </div>
         </main>
-        <footer className="flex-shrink-0 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+        <footer className="mx-auto w-full max-w-7xl flex-shrink-0 px-4 sm:px-6 lg:px-8">
           <nav className="flex justify-center space-x-4">
             <a
               href="mailto:support@fantomely.com"

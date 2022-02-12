@@ -1,5 +1,6 @@
-import type { ButtonHTMLAttributes, HTMLAttributes, ReactChild } from "react";
 import { Link } from "remix";
+
+import type { ButtonHTMLAttributes, HTMLAttributes, ReactChild } from "react";
 
 type Props = {
   children: ReactChild | ReactChild[];

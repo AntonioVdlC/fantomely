@@ -1,4 +1,3 @@
-import { User } from "@prisma/client";
 import {
   ActionFunction,
   Form,
@@ -6,6 +5,9 @@ import {
   redirect,
   useLoaderData,
 } from "remix";
+
+import type { User } from "@prisma/client";
+
 import { db } from "~/utils/db.server";
 import { send } from "~/utils/email.server";
 import {

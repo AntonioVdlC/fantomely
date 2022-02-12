@@ -1,4 +1,8 @@
-import {
+import { useEffect, useState } from "react";
+import { Link, redirect, useLoaderData, useNavigate } from "remix";
+
+import type { LoaderFunction } from "remix";
+import type {
   Browser,
   Event,
   Path,
@@ -6,30 +10,23 @@ import {
   Platform,
   Website,
 } from "@prisma/client";
-import {
-  Link,
-  LoaderFunction,
-  redirect,
-  useLoaderData,
-  useNavigate,
-} from "remix";
+
 import { db } from "~/utils/db.server";
 import {
   generateRandomString,
   requireCurrentUser,
 } from "~/utils/session.server";
-
-import BrushChart from "~/components/BrushChart.client";
-import { useEffect, useState } from "react";
-
-import illustration from "~/assets/illustration_dashboard_empty.svg";
-import Button from "~/components/Button";
-import H2 from "~/components/SectionHeader";
 import classNames from "~/utils/class-names";
 import { generateWebsiteColor, generateWebsiteInitials } from "~/utils/website";
-import LayoutGrid from "~/components/LayoutGrid";
+
 import BarChart from "~/components/BarChart.client";
+import BrushChart from "~/components/BrushChart.client";
+import Button from "~/components/Button";
+import H2 from "~/components/SectionHeader";
+import LayoutGrid from "~/components/LayoutGrid";
 import Loading from "~/components/Loading";
+
+import illustration from "~/assets/illustration_dashboard_empty.svg";
 
 type DashboardElement = {
   id: string;
@@ -222,16 +219,16 @@ export default function DashboardRoute() {
             <div
               className={classNames(
                 generateWebsiteColor(data.website.name),
-                "flex-shrink-0 flex items-center justify-center w-16 text-white text-xl font-medium rounded-l-md shadow-sm"
+                "flex w-16 flex-shrink-0 items-center justify-center rounded-l-md text-xl font-medium text-white shadow-sm"
               )}
             >
               {generateWebsiteInitials(data.website.name)}
             </div>
-            <div className="flex-1 flex items-center justify-between border-t border-r border-b border-slate-200 bg-white rounded-r-md truncate shadow-sm">
-              <div className="flex-1 px-4 py-2 text-sm truncate">
+            <div className="flex flex-1 items-center justify-between truncate rounded-r-md border-t border-r border-b border-slate-200 bg-white shadow-sm">
+              <div className="flex-1 truncate px-4 py-2 text-sm">
                 <Link
                   to={`/app/websites/details/${data.website.id}`}
-                  className="block text-slate-900 font-medium hover:text-slate-600"
+                  className="block font-medium text-slate-900 hover:text-slate-600"
                 >
                   {data.website.name}
                 </Link>
@@ -293,7 +290,7 @@ export default function DashboardRoute() {
 
       <hr className="mt-4 mb-6" />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 4xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3 4xl:grid-cols-4">
         <div>
           <H2>Dates</H2>
           <div className="mt-1">
@@ -414,7 +411,7 @@ export default function DashboardRoute() {
       </div>
     </>
   ) : (
-    <div className="flex flex-col items-center max-w-xl mx-auto">
+    <div className="mx-auto flex max-w-xl flex-col items-center">
       <img
         className="h-60"
         src={illustration}

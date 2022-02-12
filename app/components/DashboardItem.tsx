@@ -1,9 +1,10 @@
+import { Link } from "remix";
 import {
   ArrowSmUpIcon,
   ArrowSmDownIcon,
   MinusSmIcon,
 } from "@heroicons/react/outline";
-import { Link } from "remix";
+
 import classNames from "~/utils/class-names";
 import { generateWebsiteColor, generateWebsiteInitials } from "~/utils/website";
 
@@ -27,18 +28,18 @@ type Props = {
 
 export default function DashboardItem({ item }: Props) {
   return (
-    <div className="relative bg-white pt-4 px-4 pb-14 shadow rounded-lg overflow-hidden flex">
+    <div className="relative flex overflow-hidden rounded-lg bg-white px-4 pt-4 pb-14 shadow">
       <div
         className={classNames(
           generateWebsiteColor(item.name),
-          "flex-shrink-0 flex items-center justify-center w-16 text-white text-2xl font-medium rounded-md shadow-sm"
+          "flex w-16 flex-shrink-0 items-center justify-center rounded-md text-2xl font-medium text-white shadow-sm"
         )}
       >
         {generateWebsiteInitials(item.name)}
       </div>
-      <div className="flex-1 flex flex-col justify-between py-1">
+      <div className="flex flex-1 flex-col justify-between py-1">
         <dt>
-          <p className="ml-4 text-sm font-medium text-slate-500 truncate">
+          <p className="ml-4 truncate text-sm font-medium text-slate-500">
             {item.name}
           </p>
         </dt>
@@ -53,22 +54,22 @@ export default function DashboardItem({ item }: Props) {
                 : item.stats.change < 0
                 ? "bg-red-100 text-red-800"
                 : "bg-slate-100 text-slate-800",
-              "inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium md:mt-2 lg:mt-0"
+              "inline-flex items-baseline rounded-full px-2.5 py-0.5 text-sm font-medium md:mt-2 lg:mt-0"
             )}
           >
             {item.stats.change > 0 ? (
               <ArrowSmUpIcon
-                className="-ml-1 mr-0.5 flex-shrink-0 self-center h-5 w-5 text-green-500"
+                className="-ml-1 mr-0.5 h-5 w-5 flex-shrink-0 self-center text-green-500"
                 aria-hidden="true"
               />
             ) : item.stats.change < 0 ? (
               <ArrowSmDownIcon
-                className="-ml-1 mr-0.5 flex-shrink-0 self-center h-5 w-5 text-red-500"
+                className="-ml-1 mr-0.5 h-5 w-5 flex-shrink-0 self-center text-red-500"
                 aria-hidden="true"
               />
             ) : (
               <MinusSmIcon
-                className="-ml-1 mr-0.5 flex-shrink-0 self-center h-5 w-5 text-slate-500"
+                className="-ml-1 mr-0.5 h-5 w-5 flex-shrink-0 self-center text-slate-500"
                 aria-hidden="true"
               />
             )}
@@ -83,11 +84,11 @@ export default function DashboardItem({ item }: Props) {
             </span>
             {Math.abs(item.stats.change)}
           </div>
-          <div className="absolute bottom-0 inset-x-0 bg-slate-50 px-4 py-3">
+          <div className="absolute inset-x-0 bottom-0 bg-slate-50 px-4 py-3">
             <div className="text-sm">
               <Link
                 to={`/app/dashboard/${item.id}`}
-                className="font-medium text-slate-600 hover:text-slate-500 block"
+                className="block font-medium text-slate-600 hover:text-slate-500"
               >
                 {" "}
                 View details

@@ -1,9 +1,11 @@
-import { LoaderFunction, useCatch } from "remix";
-import { redirect } from "remix";
-import ErrorPage from "~/components/ErrorPage";
-import Loading from "~/components/Loading";
+import { redirect, useCatch } from "remix";
+
+import type { LoaderFunction } from "remix";
 
 import { createUserSession, getUserId, login } from "~/utils/session.server";
+
+import ErrorPage from "~/components/ErrorPage";
+import Loading from "~/components/Loading";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await getUserId(request);

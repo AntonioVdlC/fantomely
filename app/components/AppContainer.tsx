@@ -1,15 +1,17 @@
+import { FC, ReactChild, useEffect, useState } from "react";
+import { useLocation } from "remix";
 import {
   GlobeIcon,
   DocumentReportIcon,
   CreditCardIcon,
   CogIcon,
 } from "@heroicons/react/outline";
-import { User, Website } from "@prisma/client";
-import { FC, ReactChild, useEffect, useState } from "react";
-import { useLocation } from "remix";
-import AppNavigationMobile from "./AppNavigationMobile";
-import AppNavigationSide from "./AppNavigationSide";
-import AppNavigationTop from "./AppNavigationTop";
+
+import type { User, Website } from "@prisma/client";
+
+import AppNavigationMobile from "~/components/AppNavigationMobile";
+import AppNavigationSide from "~/components/AppNavigationSide";
+import AppNavigationTop from "~/components/AppNavigationTop";
 
 export type NavigationItem = {
   name: string;
@@ -91,7 +93,7 @@ export default function AppContainer({ children, user, websites }: Props) {
 
       <AppNavigationSide navigation={navigation} />
 
-      <div className="lg:pl-48 flex flex-col flex-1">
+      <div className="flex flex-1 flex-col lg:pl-48">
         <AppNavigationTop
           setSidebarOpen={setSidebarOpen}
           user={user}

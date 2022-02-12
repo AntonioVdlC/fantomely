@@ -1,11 +1,14 @@
-import { Plan } from "@prisma/client";
-import { LoaderFunction, useLoaderData } from "remix";
+import { useLoaderData } from "remix";
+
+import type { LoaderFunction } from "remix";
+import type { Plan } from "@prisma/client";
+
+import { db } from "~/utils/db.server";
 import { requireCurrentUser } from "~/utils/session.server";
 
+import Button from "~/components/Button";
 import H2 from "~/components/SectionHeader";
 import LayoutGrid from "~/components/LayoutGrid";
-import { db } from "~/utils/db.server";
-import Button from "~/components/Button";
 
 type LoaderData = {
   plan: Plan;
@@ -124,7 +127,7 @@ export default function PlanRoute() {
       </LayoutGrid>
 
       <div className="mb-12"></div>
-      <div className="max-w-md mx-auto">
+      <div className="mx-auto max-w-md">
         <Button to="/pricing" secondary>
           Learn more about pricing
         </Button>

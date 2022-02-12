@@ -1,4 +1,4 @@
-import { ReactChild } from "react";
+import type { ReactChild } from "react";
 
 type Props = {
   children: ReactChild | ReactChild[];
@@ -6,7 +6,7 @@ type Props = {
 
 export default function SectionHeader({ children }: Props) {
   return (
-    <h2 className="text-slate-500 text-xs font-medium uppercase tracking-wide">
+    <h2 className="text-xs font-medium uppercase tracking-wide text-slate-500">
       {children}
     </h2>
   );

@@ -1,10 +1,11 @@
-import type { LoaderFunction } from "remix";
 import { useLoaderData } from "remix";
+
+import type { LoaderFunction } from "remix";
+
+import { getUserId } from "~/utils/session.server";
 
 import Footer from "~/components/Footer";
 import Header from "~/components/Header";
-
-import { getUserId } from "~/utils/session.server";
 
 type LoaderData = {
   isUserLoggedIn: boolean;

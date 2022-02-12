@@ -1,5 +1,8 @@
-import { Website } from "@prisma/client";
-import { LoaderFunction, useLoaderData, Link } from "remix";
+import { useLoaderData, Link } from "remix";
+
+import type { LoaderFunction } from "remix";
+import type { Website } from "@prisma/client";
+
 import { db } from "~/utils/db.server";
 import { requireCurrentUser } from "~/utils/session.server";
 
@@ -58,7 +61,7 @@ export default function WebsitesRoute() {
           {data.isWebsiteCountBelowLimit ? (
             <WebsiteCreateForm />
           ) : (
-            <p className="text-sm mt-3">
+            <p className="mt-3 text-sm">
               You have reached the limit of websites you can add with your
               current <Link to="/app/plan">plan</Link>. Please delete another
               webiste or upgrade your plan to add more websites.

@@ -1,4 +1,7 @@
-import { LoaderFunction, Outlet, redirect } from "remix";
+import { Outlet, redirect } from "remix";
+
+import type { LoaderFunction } from "remix";
+
 import { requireAdminSession } from "~/utils/session.server";
 
 export const loader: LoaderFunction = async ({ request }) => {

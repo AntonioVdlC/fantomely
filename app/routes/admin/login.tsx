@@ -1,11 +1,13 @@
-import { ActionFunction, Form, useActionData } from "remix";
+import { Form, useActionData } from "remix";
+
+import type { ActionFunction } from "remix";
+
 import { db } from "~/utils/db.server";
+import { send } from "~/utils/email.server";
 import {
   createAdminSession,
   generateRandomString,
 } from "~/utils/session.server";
-
-import { send } from "~/utils/email.server";
 
 type ActionData = {
   tokenSent: boolean;

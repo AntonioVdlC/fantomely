@@ -1,8 +1,10 @@
-import { Menu, Transition } from "@headlessui/react";
-import { DotsVerticalIcon } from "@heroicons/react/outline";
-import { Website } from "@prisma/client";
 import { Fragment } from "react";
 import { Link, Form } from "remix";
+import { Menu, Transition } from "@headlessui/react";
+import { DotsVerticalIcon } from "@heroicons/react/outline";
+
+import type { Website } from "@prisma/client";
+
 import classNames from "~/utils/class-names";
 import { generateWebsiteColor, generateWebsiteInitials } from "~/utils/website";
 
@@ -16,16 +18,16 @@ export default function WebsiteListItem({ website }: Props) {
       <div
         className={classNames(
           generateWebsiteColor(website.name),
-          "flex-shrink-0 flex items-center justify-center w-16 text-white text-xl font-medium rounded-l-md shadow-sm"
+          "flex w-16 flex-shrink-0 items-center justify-center rounded-l-md text-xl font-medium text-white shadow-sm"
         )}
       >
         {generateWebsiteInitials(website.name)}
       </div>
-      <div className="flex-1 flex items-center justify-between border-t border-r border-b border-slate-200 bg-white rounded-r-md truncate shadow-sm">
-        <div className="flex-1 px-4 py-2 text-sm truncate">
+      <div className="flex flex-1 items-center justify-between truncate rounded-r-md border-t border-r border-b border-slate-200 bg-white shadow-sm">
+        <div className="flex-1 truncate px-4 py-2 text-sm">
           <Link
             to={`/app/websites/details/${website.id}`}
-            className="block text-slate-900 font-medium hover:text-slate-600"
+            className="block font-medium text-slate-900 hover:text-slate-600"
           >
             {website.name}
           </Link>
@@ -43,7 +45,7 @@ export default function WebsiteListItem({ website }: Props) {
       </div>
       <Menu as="div" className="relative ml-1 inline-block text-left">
         <div>
-          <Menu.Button className="w-6 h-6 bg-white inline-flex items-center justify-center text-slate-400 rounded-full bg-transparent hover:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-500">
+          <Menu.Button className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white bg-transparent text-slate-400 hover:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-500">
             <span className="sr-only">Open options</span>
             <DotsVerticalIcon className="h-5 w-5" aria-hidden="true" />
           </Menu.Button>
@@ -58,7 +60,7 @@ export default function WebsiteListItem({ website }: Props) {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="origin-top-right absolute right-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+          <Menu.Items className="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             <div className="py-1">
               <Menu.Item>
                 {({ active }) => (
@@ -92,8 +94,8 @@ export default function WebsiteListItem({ website }: Props) {
                     <button
                       type="submit"
                       className={classNames(
-                        active ? "text-slate-100 bg-red-700" : "text-red-700",
-                        "block w-full text-left px-4 py-2 text-sm"
+                        active ? "bg-red-700 text-slate-100" : "text-red-700",
+                        "block w-full px-4 py-2 text-left text-sm"
                       )}
                     >
                       Delete

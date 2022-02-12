@@ -1,8 +1,10 @@
-import type { LoaderFunction } from "remix";
 import { Link, redirect, useSearchParams } from "remix";
-import Logo from "~/components/Logo";
+
+import type { LoaderFunction } from "remix";
 
 import { getUserId } from "~/utils/session.server";
+
+import Logo from "~/components/Logo";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await getUserId(request);
@@ -20,14 +22,14 @@ export default function LoginSentRoute() {
 
   return (
     <>
-      <div className="flex justify-center animate-bounce">
+      <div className="flex animate-bounce justify-center">
         <Logo size="lg" withLink />
       </div>
-      <div className="mt-6 text-center px-4 md:w-1/2">
+      <div className="mt-6 px-4 text-center md:w-1/2">
         <p>Thanks you for joining the waitlist!</p>
         <p className="mt-3">
           We will send you an email to{" "}
-          <span className="text-slate-700 font-bold">
+          <span className="font-bold text-slate-700">
             {decodeURIComponent(searchParams.get("email") || "")}
           </span>{" "}
           to finish your registration once we open up to more users.

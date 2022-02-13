@@ -73,7 +73,7 @@ export const action: ActionFunction = async ({ request }) => {
           subject: "Welcome to Fantomely",
           text: `Welcome to Fantomely!
           You can now finish your registration using the following link: ${
-            new URL(request.url).origin
+            process.env.BASE_URL
           }/auth/waitlist/callback?email=${encodeURIComponent(
             user.email
           )}&token=${waitlistToken}`,

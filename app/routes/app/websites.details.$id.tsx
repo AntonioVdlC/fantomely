@@ -31,7 +31,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const user = await requireCurrentUser(request);
   const website = await db.website.findUnique({ where: { id: params.id } });
 
-  return { website, user, origin: new URL(request.url).origin };
+  return { website, user, origin: process.env.BASE_URL };
 };
 
 export default function WebsiteDetailsRoute() {

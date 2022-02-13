@@ -82,7 +82,7 @@ export const action: ActionFunction = async ({ request }) => {
       subject: "Log into fantomely",
       text: `Log into fantomely!
           Here is your magic link to log into your fantomely account: ${
-            new URL(request.url).origin
+            process.env.BASE_URL
           }/auth/login/callback?email=${encodeURIComponent(email)}&token=${
         magicLink.token
       }&redirectTo=${redirectTo}`,

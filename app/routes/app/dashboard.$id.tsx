@@ -169,25 +169,27 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     }
   });
 
-  for (
-    let i = 0, date = periods[0].value as number;
-    i < periods.length || date < Date.now();
-    date += 24 * 60 * 60 * 1000
-  ) {
-    if (periods[i]?.value === date) {
+  if (periods.length) {
+    for (
+      let i = 0, date = periods[0].value as number;
+      i < periods.length || date < Date.now();
+      date += 24 * 60 * 60 * 1000
+    ) {
+      if (periods[i]?.value === date) {
+        filledPeriods.push({
+          id: periods[i].id,
+          value: periods[i].value,
+          count: periods[i].count,
+        });
+        i++;
+        continue;
+      }
       filledPeriods.push({
-        id: periods[i].id,
-        value: periods[i].value,
-        count: periods[i].count,
+        id: generateRandomString(8),
+        value: date,
+        count: 0,
       });
-      i++;
-      continue;
     }
-    filledPeriods.push({
-      id: generateRandomString(8),
-      value: date,
-      count: 0,
-    });
   }
 
   return {

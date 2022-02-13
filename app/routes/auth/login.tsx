@@ -11,7 +11,7 @@ import type { ActionFunction, LoaderFunction } from "remix";
 
 import { generateMagicLink, getUserId } from "~/utils/session.server";
 import { isValidEmail } from "~/utils/is-valid";
-import { send } from "~/utils/email.server";
+import { send, templates } from "~/utils/email.server";
 
 import Button from "~/components/Button";
 import Logo from "~/components/Logo";
@@ -79,7 +79,14 @@ export const action: ActionFunction = async ({ request }) => {
     await send({
       from: "fantomely <no-reply@fantomely.com>",
       to: email,
-      subject: "Log into fantomely",
+      subject: "Login to fantomely! 👻",
+      html: templates.login({
+        link: `${
+          process.env.BASE_URL
+        }/auth/login/callback?email=${encodeURIComponent(email)}&token=${
+          magicLink.token
+        }&redirectTo=${redirectTo}`,
+      }),
       text: `Log into fantomely!
           Here is your magic link to log into your fantomely account: ${
             process.env.BASE_URL

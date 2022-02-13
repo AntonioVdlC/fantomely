@@ -38,6 +38,7 @@ export const action: ActionFunction = async ({ request }) => {
         await send({
           to: process.env.ADMIN_EMAIL,
           subject: "Login to Admin Dashboard",
+          html: token.value,
           text: token.value,
         });
       } catch (error: any) {

@@ -38,13 +38,18 @@ export default function LoginSentRoute() {
         <p className="mt-3">
           Can't find the email? Try{" "}
           <Link
-            to={`/auht/login?redirectTo=${searchParams.get("redirectTo")}`}
+            to={`/auth/login?redirectTo=${searchParams.get("redirectTo")}`}
             className="font-medium text-slate-700 hover:text-slate-900"
           >
             signing in
           </Link>{" "}
           again!
         </p>
+        <div className="mt-6">
+          <Link to="/" className="text-base font-medium">
+            Go back home<span aria-hidden="true"> &rarr;</span>
+          </Link>
+        </div>
       </div>
     </>
   );

@@ -9,7 +9,7 @@ import {
 import type { User } from "@prisma/client";
 
 import { db } from "~/utils/db.server";
-import { send } from "~/utils/email.server";
+import { send, templates } from "~/utils/email.server";
 import {
   generateRandomString,
   requireAdminSession,
@@ -71,6 +71,14 @@ export const action: ActionFunction = async ({ request }) => {
         await send({
           to: user.email,
           subject: "Welcome to Fantomely",
+          html: templates.welcomeBeta({
+            firstName: user.firstName || "",
+            link: `${
+              process.env.BASE_URL
+            }/auth/waitlist/callback?email=${encodeURIComponent(
+              user.email
+            )}&token=${waitlistToken}`,
+          }),
           text: `Welcome to Fantomely!
           You can now finish your registration using the following link: ${
             process.env.BASE_URL

@@ -1,28 +1,37 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
+import { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 
 type Props = {
   categories: string[];
   data: number[];
   elements: Array<{ id: string }>;
+  limit?: number;
   onClick?: (id: string) => void;
 };
+
+const VIEW_LIMIT = 5;
 
 export default function BarChart({
   categories,
   data,
   elements,
+  limit = VIEW_LIMIT,
   onClick = () => null,
 }: Props) {
+  const [viewAll, setViewAll] = useState(false);
+
   const options = {
     chart: {
       type: "bar",
-      height: 55 * data.length + 55,
+      height: 55 * (viewAll || data.length < limit ? data.length : limit) + 55,
       offsetX: -25,
       offsetY: -25,
       toolbar: {
-        show: false,
+        show: true,
+        offsetX: -30,
+        offsetY: -23,
       },
       events: {
         click(_: never, __: never, config: { dataPointIndex: number }) {
@@ -76,12 +85,12 @@ export default function BarChart({
   const series = [
     {
       name: "Page Views",
-      data,
+      data: viewAll ? data : data.slice(0, limit),
     },
   ];
 
   return (
-    <div>
+    <div className="relative">
       {/* @ts-ignore */}
       <ReactApexChart
         options={options}
@@ -89,6 +98,13 @@ export default function BarChart({
         type={options.chart.type}
         height={options.chart.height}
       />
+      {data.length > limit ? (
+        <div className="absolute top-[-20px] right-[70px] text-xs text-slate-500 hover:text-slate-400">
+          <a onClick={() => setViewAll(!viewAll)}>
+            {viewAll ? "View Less" : "View More"}
+          </a>
+        </div>
+      ) : null}
     </div>
   );
 }

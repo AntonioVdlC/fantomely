@@ -21,6 +21,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const websites = await db.website.findMany({
     where: { orgId: user.currentOrg.id, isActive: true },
+    orderBy: { createdAt: "asc" },
   });
 
   return {

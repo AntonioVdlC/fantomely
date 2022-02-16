@@ -37,6 +37,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const user = await requireCurrentUser(request);
   const websites = await db.website.findMany({
     where: { orgId: user.currentOrg.id, isActive: true },
+    orderBy: { createdAt: "asc" },
   });
 
   if (!websites.length) {

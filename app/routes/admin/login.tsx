@@ -36,6 +36,7 @@ export const action: ActionFunction = async ({ request }) => {
 
       try {
         await send({
+          from: "fantomely <no-reply@fantomely.com>",
           to: process.env.ADMIN_EMAIL,
           subject: "Login to Admin Dashboard",
           html: token.value,

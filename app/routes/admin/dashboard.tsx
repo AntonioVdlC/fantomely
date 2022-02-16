@@ -69,6 +69,7 @@ export const action: ActionFunction = async ({ request }) => {
       // Send invite link
       try {
         await send({
+          from: "fantomely <hi@fantomely.com>",
           to: user.email,
           subject: "Welcome to Fantomely",
           html: templates.welcomeBeta({

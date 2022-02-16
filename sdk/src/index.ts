@@ -1,6 +1,3 @@
-// TODO: Remove console logs?
-/* eslint-disable no-console */
-
 window.addEventListener("DOMContentLoaded", function () {
   const script = document.querySelector("script[data-fantomely]");
 
@@ -23,9 +20,7 @@ window.addEventListener("DOMContentLoaded", function () {
         p: window.location.href.slice(0, 280),
         r: document.referrer.slice(0, 280),
       }),
-    })
-      .then(() => console.log("Event sent successfully."))
-      .catch(console.error);
+    }).catch(() => null);
   }
 
   if (typeof window !== "undefined") {

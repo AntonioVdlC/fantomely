@@ -22,8 +22,10 @@ export const action: ActionFunction = async ({ request }) => {
   const useragent = parseClientHints(request);
 
   // Website
+  const publicKey = payload[KEYS.PUBLIC_KEY];
+
   const website = await db.website.findFirst({
-    where: { publicKey: payload[KEYS.PUBLIC_KEY] },
+    where: { publicKey },
   });
 
   if (!website || website.url !== origin) {
@@ -33,13 +35,17 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   // Path
+  const formattedPath = website.ignoreQueryString
+    ? payload[KEYS.PATH].split("?")[0]
+    : payload[KEYS.PATH];
+
   let path = await db.path.findUnique({
-    where: { path: { value: payload[KEYS.PATH], websiteId: website.id } },
+    where: { path: { value: formattedPath, websiteId: website.id } },
   });
   if (!path) {
     path = await db.path.create({
       data: {
-        value: payload[KEYS.PATH],
+        value: formattedPath,
         websiteId: website.id,
       },
     });

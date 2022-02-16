@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLoaderData, Link } from "remix";
+import { useLoaderData, Link, ActionFunction } from "remix";
 import {
   ExternalLinkIcon,
   ClipboardCopyIcon,
@@ -7,7 +7,7 @@ import {
 } from "@heroicons/react/outline";
 
 import type { LoaderFunction } from "remix";
-import type { Org, User, UserOrg, Website } from "@prisma/client";
+import { Org, Role, User, UserOrg, Website } from "@prisma/client";
 
 import classNames from "~/utils/class-names";
 import { db } from "~/utils/db.server";
@@ -15,6 +15,7 @@ import { requireCurrentUser } from "~/utils/session.server";
 import { generateWebsiteColor, generateWebsiteInitials } from "~/utils/website";
 
 import H2 from "~/components/SectionHeader";
+import Button from "~/components/Button";
 import LayoutGrid from "~/components/LayoutGrid";
 
 type LoaderData = {
@@ -32,6 +33,35 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const website = await db.website.findUnique({ where: { id: params.id } });
 
   return { website, user, origin: process.env.BASE_URL };
+};
+
+export const action: ActionFunction = async ({ params, request }) => {
+  const user = await requireCurrentUser(request);
+  const website = await db.website.findUnique({ where: { id: params.id } });
+
+  if (!website) {
+    throw new Response("Website not found", { status: 404 });
+  }
+
+  if (
+    user.currentOrg.id !== website.orgId &&
+    ![Role.ADMIN.toString(), Role.OWNER.toString()].includes(
+      user.currentOrg.role
+    )
+  ) {
+    throw new Response("", { status: 403 });
+  }
+
+  const form = await request.formData();
+
+  const ignoreQueryString = Boolean(form.get("ignore-query-string"));
+
+  await db.website.update({
+    data: { ignoreQueryString },
+    where: { id: website.id },
+  });
+
+  return null;
 };
 
 export default function WebsiteDetailsRoute() {
@@ -138,6 +168,48 @@ export default function WebsiteDetailsRoute() {
         <p className="mt-3 text-sm">
           <Link to="/docs">Need help?</Link>
         </p>
+      </div>
+
+      <hr className="my-6" />
+
+      <H2>Website Settings</H2>
+      <div className="mt-5">
+        <form method="post">
+          <div className="relative flex items-start">
+            <div className="flex h-5 items-center">
+              <input
+                id="ignore-query-string"
+                aria-describedby="ignore-query-string-description"
+                name="ignore-query-string"
+                type="checkbox"
+                defaultChecked={data.website.ignoreQueryString}
+                className="h-4 w-4 rounded border-slate-300 text-slate-600 focus:ring-slate-500"
+              />
+            </div>
+            <div className="ml-3 text-sm">
+              <label
+                htmlFor="ignore-query-string"
+                className="font-medium text-slate-700"
+              >
+                Ignore query string
+              </label>
+              <p
+                id="ignore-query-string-description"
+                className="text-slate-500"
+              >
+                Don't track changes in query string values.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-5">
+            <LayoutGrid>
+              <Button type="submit" primary>
+                Update Settings
+              </Button>
+            </LayoutGrid>
+          </div>
+        </form>
       </div>
     </>
   );

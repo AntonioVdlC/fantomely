@@ -118,22 +118,23 @@ model MagicLink {
 }
 
 model Website {
-  id            String     @id @default(uuid())
-  name          String
-  url           String
-  publicKey     String     @unique
-  orgId         String
-  org           Org        @relation(fields: [orgId], references: [id])
-  periods       Period[]
-  events        Event[]
-  paths         Path[]
-  browsers      Browser[]
-  platforms     Platform[]
-  createdById   String
-  createdByUser User       @relation(fields: [createdById], references: [id])
-  isActive      Boolean    @default(true)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  id                String     @id @default(uuid())
+  name              String
+  url               String
+  publicKey         String     @unique
+  ignoreQueryString Boolean    @default(false)
+  orgId             String
+  org               Org        @relation(fields: [orgId], references: [id])
+  periods           Period[]
+  events            Event[]
+  paths             Path[]
+  browsers          Browser[]
+  platforms         Platform[]
+  createdById       String
+  createdByUser     User       @relation(fields: [createdById], references: [id])
+  isActive          Boolean    @default(true)
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
 
   @@unique(fields: [url, createdById], name: "website")
 }

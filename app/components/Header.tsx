@@ -22,7 +22,7 @@ export default function Header({ isUserLoggedIn }: Props) {
       as="header"
       className="sticky top-0 z-10 bg-slate-50/90 backdrop-blur-md"
     >
-      <div className="py-6">
+      <div className="py-4 md:py-6">
         <nav
           className="relative mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6"
           aria-label="Global"

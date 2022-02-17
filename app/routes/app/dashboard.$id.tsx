@@ -8,6 +8,7 @@ import type {
   Path,
   Period,
   Platform,
+  Referrer,
   Website,
 } from "@prisma/client";
 
@@ -42,21 +43,22 @@ type LoaderData = {
     browser?: Browser;
     platform?: Platform;
   })[];
-  element: Path | Browser | Platform | undefined;
+  element: Path | Browser | Platform | Referrer | undefined;
   paths: DashboardElement[];
   periods: DashboardElement[];
   browsers: DashboardElement[];
   platforms: DashboardElement[];
+  referrers: DashboardElement[];
 };
 
-type ElementKey = "path" | "browser" | "platform" | undefined;
+type ElementKey = "path" | "browser" | "platform" | "referrer" | undefined;
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { searchParams } = new URL(request.url);
   const websiteId = params.id;
   const el: ElementKey =
     searchParams.get("el") &&
-    ["path", "browser", "platform"].includes(
+    ["path", "browser", "platform", "referrer"].includes(
       searchParams.get("el")?.toString() ?? ""
     )
       ? (searchParams.get("el") as ElementKey)
@@ -76,18 +78,24 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   let where = { websiteId: website.id };
-  if (el && ["path", "browser", "platform"].includes(el) && elId) {
+  if (el && ["path", "browser", "platform", "referrer"].includes(el) && elId) {
     where = { ...where, [`${el}Id`]: elId };
   }
 
   const events = await db.event.findMany({
     where,
-    include: { path: true, period: true, browser: true, platform: true },
+    include: {
+      path: true,
+      period: true,
+      browser: true,
+      platform: true,
+      referrer: true,
+    },
     orderBy: { period: { createdAt: "asc" } },
   });
 
   let element;
-  if (el && ["path", "browser", "platform"].includes(el) && elId) {
+  if (el && ["path", "browser", "platform", "referrer"].includes(el) && elId) {
     const event = events.find((event) => Boolean(event[el]));
     if (event) {
       element = event[el];
@@ -103,6 +111,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const filledPeriods: DashboardElement[] = [];
   const browsers: DashboardElement[] = [];
   const platforms: DashboardElement[] = [];
+  const referrers: DashboardElement[] = [];
   events.forEach((event) => {
     const path = paths.find((path) => path.id === event.pathId);
     if (path) {
@@ -167,6 +176,21 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         });
       }
     }
+
+    if (event.referrer) {
+      const referrer = referrers.find(
+        (referrer) => referrer.id === event.referrer?.id
+      );
+      if (referrer) {
+        referrer.count += event.count;
+      } else {
+        referrers.push({
+          id: event.referrer.id,
+          value: event.referrer.value,
+          count: event.count,
+        });
+      }
+    }
   });
 
   if (periods.length) {
@@ -200,6 +224,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     periods: filledPeriods,
     platforms,
     browsers,
+    referrers,
   };
 };
 
@@ -409,6 +434,40 @@ export default function DashboardRoute() {
               </div>
             )}
           </div>
+        </div>
+        <div>
+          <H2>Referrers</H2>
+          {data.referrers.length ? (
+            <div className="mt-1 cursor-pointer">
+              {isMounted ? (
+                <BarChart
+                  key={data.element?.id || data.website.id}
+                  data={data.referrers
+                    .sort((a, b) => b.count - a.count)
+                    .map((referrer) => referrer.count)}
+                  categories={data.referrers
+                    .sort((a, b) => b.count - a.count)
+                    .map((referrer) => String(referrer.value))}
+                  elements={data.referrers.map((referrer) => ({
+                    id: referrer.id,
+                  }))}
+                  onClick={(id) =>
+                    navigate(
+                      `/app/dashboard/${data.website.id}?el=referrer&elId=${id}`
+                    )
+                  }
+                />
+              ) : (
+                <div className="flex flex-col items-center">
+                  <Loading />
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="mt-1">
+              <p>No data.</p>
+            </div>
+          )}
         </div>
       </div>
     </>

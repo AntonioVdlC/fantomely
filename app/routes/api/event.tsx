@@ -101,6 +101,20 @@ export const action: ActionFunction = async ({ request }) => {
     });
   }
 
+  // Referrer
+  const formattedReferrer = payload[KEYS.REFERRER] || "Direct";
+  let referrer = await db.referrer.findUnique({
+    where: { referrer: { value: formattedReferrer, websiteId: website.id } },
+  });
+  if (!referrer) {
+    referrer = await db.referrer.create({
+      data: {
+        value: formattedReferrer,
+        websiteId: website.id,
+      },
+    });
+  }
+
   // Upsert event
   await db.event.upsert({
     where: {
@@ -110,6 +124,7 @@ export const action: ActionFunction = async ({ request }) => {
         pathId: path.id,
         browserId: browser.id || "",
         platformId: platform.id || "",
+        referrerId: referrer.id,
       },
     },
     create: {
@@ -118,6 +133,7 @@ export const action: ActionFunction = async ({ request }) => {
       pathId: path.id,
       browserId: browser.id || "",
       platformId: platform.id || "",
+      referrerId: referrer.id,
       count: 1,
     },
     update: {

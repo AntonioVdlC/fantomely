@@ -130,6 +130,7 @@ model Website {
   paths             Path[]
   browsers          Browser[]
   platforms         Platform[]
+  referrers         Referrer[]
   createdById       String
   createdByUser     User       @relation(fields: [createdById], references: [id])
   isActive          Boolean    @default(true)
@@ -175,6 +176,18 @@ model Platform {
   @@unique(fields: [value, websiteId], name: "platform")
 }
 
+model Referrer {
+  id        String   @id @default(uuid())
+  value     String
+  websiteId String
+  website   Website  @relation(fields: [websiteId], references: [id])
+  events    Event[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique(fields: [value, websiteId], name: "referrer")
+}
+
 model Event {
   id         String    @id @default(uuid())
   type       EventType @default(PAGEVIEW)
@@ -189,10 +202,12 @@ model Event {
   browser    Browser?  @relation(fields: [browserId], references: [id])
   platformId String?
   platform   Platform? @relation(fields: [platformId], references: [id])
+  referrerId String?
+  referrer   Referrer? @relation(fields: [referrerId], references: [id])
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
-  @@unique(fields: [websiteId, periodId, pathId, browserId, platformId], name: "website_period_path")
+  @@unique(fields: [websiteId, periodId, pathId, browserId, platformId, referrerId], name: "website_period_path")
 }
 
 model Period {

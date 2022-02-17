@@ -1,4 +1,4 @@
-import { Form, json, redirect, useActionData } from "remix";
+import { Form, json, redirect, useActionData, useTransition } from "remix";
 import { Role } from "@prisma/client";
 
 import type { ActionFunction, LoaderFunction } from "remix";
@@ -11,6 +11,7 @@ import {
 } from "~/utils/session.server";
 
 import Button from "~/components/Button";
+import Input from "~/components/Input";
 import Logo from "~/components/Logo";
 
 import illustration from "~/assets/illustration_onboarding.svg";
@@ -103,6 +104,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 export default function OnboardingOrgCreationRoute() {
   const actionData = useActionData<ActionData>();
+  const transition = useTransition();
 
   return (
     <>
@@ -129,88 +131,28 @@ export default function OnboardingOrgCreationRoute() {
                         actionData?.formError ? "form-error-message" : undefined
                       }
                     >
-                      <div>
-                        <label
-                          htmlFor="first-name-input"
-                          className="block text-sm font-medium text-slate-700"
-                        >
-                          First Name
-                        </label>
-                        <input
-                          id="first-name-input"
-                          name="first-name"
-                          defaultValue={actionData?.fields?.firstName}
-                          type="text"
-                          required
-                          placeholder="Jane"
-                          className="block w-full appearance-none rounded-md border border-slate-300 px-3 py-2 placeholder-slate-400 shadow-sm focus:border-slate-500 focus:outline-none focus:ring-slate-500 sm:text-sm"
-                          aria-invalid={
-                            Boolean(actionData?.fieldErrors?.firstName) ||
-                            undefined
-                          }
-                          aria-describedby={
-                            actionData?.fieldErrors?.firstName
-                              ? "first-name-error"
-                              : undefined
-                          }
-                        />
-                        {actionData?.fieldErrors?.firstName ? (
-                          <p
-                            className="form-validation-error"
-                            role="alert"
-                            id="first-name-error"
-                          >
-                            {actionData?.fieldErrors.firstName}
-                          </p>
-                        ) : null}
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="last-name-input"
-                          className="block text-sm font-medium text-slate-700"
-                        >
-                          Last Name
-                        </label>
-                        <input
-                          id="last-name-input"
-                          name="last-name"
-                          defaultValue={actionData?.fields?.lastName}
-                          type="text"
-                          required
-                          placeholder="Doe"
-                          className="block w-full appearance-none rounded-md border border-slate-300 px-3 py-2 placeholder-slate-400 shadow-sm focus:border-slate-500 focus:outline-none focus:ring-slate-500 sm:text-sm"
-                          aria-invalid={
-                            Boolean(actionData?.fieldErrors?.lastName) ||
-                            undefined
-                          }
-                          aria-describedby={
-                            actionData?.fieldErrors?.lastName
-                              ? "last-name-error"
-                              : undefined
-                          }
-                        />
-                        {actionData?.fieldErrors?.lastName ? (
-                          <p
-                            className="form-validation-error"
-                            role="alert"
-                            id="last-name-error"
-                          >
-                            {actionData?.fieldErrors.lastName}
-                          </p>
-                        ) : null}
-                      </div>
-
-                      <div id="form-error-message">
-                        {actionData?.formError ? (
-                          <>
-                            <p className="form-validation-error" role="alert">
-                              {actionData?.formError}
-                            </p>
-                          </>
-                        ) : null}
-                      </div>
-                      <Button type="submit" primary>
-                        Create account
+                      <Input
+                        type="text"
+                        name="first-name"
+                        label="First Name"
+                        placeholder="Jane"
+                        required
+                      />
+                      <Input
+                        type="text"
+                        name="last-name"
+                        label="Last Name"
+                        placeholder="Doe"
+                        required
+                      />
+                      <Button
+                        type="submit"
+                        primary
+                        loading={Boolean(transition.submission)}
+                      >
+                        {transition.submission
+                          ? "Creating ..."
+                          : "Create account"}
                       </Button>
                     </Form>
 

@@ -1,10 +1,12 @@
-import { Form } from "remix";
+import { Form, useTransition } from "remix";
 
 import Button from "~/components/Button";
 import Input from "~/components/Input";
 import LayoutGrid from "~/components/LayoutGrid";
 
 export default function WebsiteCreateForm() {
+  const transition = useTransition();
+
   return (
     <Form
       method="post"
@@ -29,8 +31,8 @@ export default function WebsiteCreateForm() {
         />
       </LayoutGrid>
       <LayoutGrid>
-        <Button primary type="submit">
-          Add website
+        <Button primary type="submit" loading={Boolean(transition.submission)}>
+          {transition.submission ? "Creating ..." : "Add website"}
         </Button>
       </LayoutGrid>
     </Form>

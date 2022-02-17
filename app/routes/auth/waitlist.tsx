@@ -1,4 +1,11 @@
-import { Form, useActionData, redirect, json, Link } from "remix";
+import {
+  Form,
+  useActionData,
+  redirect,
+  json,
+  Link,
+  useTransition,
+} from "remix";
 
 import type { ActionFunction, LoaderFunction } from "remix";
 
@@ -79,6 +86,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 export default function RegisterRoute() {
   const actionData = useActionData<ActionData>();
+  const transition = useTransition();
 
   return (
     <div className="w-screen">
@@ -140,8 +148,14 @@ export default function RegisterRoute() {
                       </div>
                     </div>
 
-                    <Button primary type="submit">
-                      Join the waitlist
+                    <Button
+                      primary
+                      type="submit"
+                      loading={Boolean(transition.submission)}
+                    >
+                      {transition.submission
+                        ? "Joining ..."
+                        : "Join the waitlist"}
                     </Button>
                   </Form>
 

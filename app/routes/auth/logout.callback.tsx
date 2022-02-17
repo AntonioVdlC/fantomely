@@ -5,7 +5,7 @@ import Logo from "~/components/Logo";
 export default function LogoutCallbackRouter() {
   return (
     <>
-      <div className="flex animate-pulse justify-center">
+      <div className="flex justify-center motion-safe:animate-pulse">
         <Logo size="lg" withLink />
       </div>
 

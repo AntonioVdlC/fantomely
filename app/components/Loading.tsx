@@ -7,7 +7,7 @@ type Props = {
 export default function Loading({ text }: Props) {
   return (
     <>
-      <div className="animate-ping">
+      <div className="motion-safe:animate-ping">
         <Logo size="md" />
       </div>
       {text ? <p className="mt-12 text-slate-900">{text}</p> : null}

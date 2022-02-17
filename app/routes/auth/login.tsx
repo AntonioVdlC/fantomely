@@ -5,6 +5,7 @@ import {
   redirect,
   useActionData,
   useSearchParams,
+  useTransition,
 } from "remix";
 
 import type { ActionFunction, LoaderFunction } from "remix";
@@ -110,6 +111,8 @@ export const action: ActionFunction = async ({ request }) => {
 export default function Login() {
   const actionData = useActionData<ActionData>();
   const [searchParams] = useSearchParams();
+  const transition = useTransition();
+
   return (
     <div className="w-screen">
       <div className="bg-slate-50 pt-10 sm:pt-16 lg:overflow-hidden lg:pt-8 lg:pb-14">
@@ -179,7 +182,11 @@ export default function Login() {
                       </div>
                     </div>
 
-                    <Button primary type="submit">
+                    <Button
+                      primary
+                      type="submit"
+                      loading={Boolean(transition.submission)}
+                    >
                       Submit
                     </Button>
                   </Form>

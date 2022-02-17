@@ -1,4 +1,4 @@
-import { Form, json, useLoaderData } from "remix";
+import { Form, json, useLoaderData, useTransition } from "remix";
 
 import type { ActionFunction, LoaderFunction } from "remix";
 import type { User } from "@prisma/client";
@@ -84,6 +84,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 export default function AppUserRoute() {
   const data = useLoaderData<LoaderData>();
+  const transition = useTransition();
 
   return (
     <>
@@ -125,8 +126,12 @@ export default function AppUserRoute() {
         <div className="mt-3"></div>
 
         <LayoutGrid>
-          <Button type="submit" primary>
-            Update
+          <Button
+            type="submit"
+            primary
+            loading={Boolean(transition.submission)}
+          >
+            {transition.submission ? "Updating ..." : "Update"}
           </Button>
         </LayoutGrid>
       </Form>

@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { useLoaderData, Link, ActionFunction } from "remix";
+import { useLoaderData, Link, Form, useTransition } from "remix";
 import {
   ExternalLinkIcon,
   ClipboardCopyIcon,
   ClipboardCheckIcon,
 } from "@heroicons/react/outline";
+import { Role } from "@prisma/client";
 
-import type { LoaderFunction } from "remix";
-import { Org, Role, User, UserOrg, Website } from "@prisma/client";
+import type { LoaderFunction, ActionFunction } from "remix";
+import type { Org, User, UserOrg, Website } from "@prisma/client";
 
 import classNames from "~/utils/class-names";
 import { db } from "~/utils/db.server";
@@ -76,6 +77,8 @@ export default function WebsiteDetailsRoute() {
       setTimeout(() => setCopiedScriptToClipboard(false), 5000);
     });
   }
+
+  const transition = useTransition();
 
   return (
     <>
@@ -174,7 +177,7 @@ export default function WebsiteDetailsRoute() {
 
       <H2>Website Settings</H2>
       <div className="mt-5">
-        <form method="post">
+        <Form method="post">
           <div className="relative flex items-start">
             <div className="flex h-5 items-center">
               <input
@@ -204,12 +207,16 @@ export default function WebsiteDetailsRoute() {
 
           <div className="mt-5">
             <LayoutGrid>
-              <Button type="submit" primary>
-                Update Settings
+              <Button
+                type="submit"
+                primary
+                loading={Boolean(transition.submission)}
+              >
+                {transition.submission ? "Updating ..." : "Update Settings"}
               </Button>
             </LayoutGrid>
           </div>
-        </form>
+        </Form>
       </div>
     </>
   );

@@ -22,7 +22,7 @@ export default function LoginSentRoute() {
 
   return (
     <>
-      <div className="flex animate-bounce justify-center">
+      <div className="flex justify-center motion-safe:animate-bounce">
         <Logo size="lg" withLink />
       </div>
       <div className="mt-6 px-4 text-center md:w-1/2">

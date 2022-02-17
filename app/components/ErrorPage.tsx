@@ -1,6 +1,7 @@
 import { Link } from "remix";
 
 import Logo from "~/components/Logo";
+import classNames from "~/utils/class-names";
 
 type Props = {
   status: number;
@@ -23,9 +24,10 @@ export default function ErrorPage({
       <div className="flex min-h-full flex-col bg-slate-50 pt-16 pb-12">
         <main className="mx-auto flex w-full max-w-7xl flex-grow flex-col justify-center px-4 sm:px-6 lg:px-8">
           <div
-            className={`flex flex-shrink-0 justify-center ${
-              status === 404 ? "animate-pulse" : ""
-            }`}
+            className={classNames(
+              "flex flex-shrink-0 justify-center",
+              status === 404 ? "motion-safe:animate-pulse" : ""
+            )}
           >
             <Logo size="lg" withLink />
           </div>

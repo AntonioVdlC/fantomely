@@ -65,6 +65,13 @@ export default function BarChart({
       },
     },
     colors: ["#e2e8f0"],
+    tooltip: {
+      y: {
+        formatter(val: number) {
+          return Math.round(val);
+        },
+      },
+    },
     xaxis: {
       categories,
       axisBorder: {
@@ -73,6 +80,11 @@ export default function BarChart({
       },
       axisTicks: {
         show: false,
+      },
+      labels: {
+        formatter(val: number) {
+          return Math.round(val);
+        },
       },
     },
     yaxis: {

@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /auth/
+Disallow: /app/
+
+Sitemap: https://fantomely.com/sitemap.xml

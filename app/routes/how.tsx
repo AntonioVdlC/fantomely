@@ -19,7 +19,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   };
 };
 
-export default function DocsScreen() {
+export default function HowItWorksScreen() {
   const data = useLoaderData<LoaderData>();
 
   return (
@@ -27,7 +27,7 @@ export default function DocsScreen() {
       <Header isUserLoggedIn={data.isUserLoggedIn} />
 
       <main className="mx-auto max-w-7xl px-8">
-        <p>Docs</p>
+        <p>How</p>
       </main>
 
       <Footer />

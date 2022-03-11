@@ -20,7 +20,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   };
 };
 
-export default function LandingScreen() {
+export default function ContributeScreen() {
   const data = useLoaderData<LoaderData>();
 
   return (

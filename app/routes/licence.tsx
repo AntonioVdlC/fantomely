@@ -24,7 +24,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   };
 };
 
-export default function LandingScreen() {
+export default function LicenceScreen() {
   const data = useLoaderData<LoaderData>();
 
   return (

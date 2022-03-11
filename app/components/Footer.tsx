@@ -3,6 +3,7 @@ import FooterSocial, { SocialPlatform } from "~/components/FooterSocial";
 export default function Footer() {
   const navigation = [
     { name: "About", href: "/about" },
+    { name: "How It Works", href: "/how" },
     { name: "Docs", href: "/docs" },
     { name: "Pricing", href: "/pricing" },
     { name: "Terms", href: "/terms" },

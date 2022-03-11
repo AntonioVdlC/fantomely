@@ -12,7 +12,7 @@ type Props = {
 
 export default function Header({ isUserLoggedIn }: Props) {
   const navigation = [
-    { name: "How It Works", href: "/how" },
+    { name: "About", href: "/about" },
     { name: "Docs", href: "/docs" },
     { name: "Pricing", href: "/pricing" },
     { name: "Contribute", href: "/contribute" },

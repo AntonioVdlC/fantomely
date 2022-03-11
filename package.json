@@ -1,14 +1,18 @@
 {
   "private": true,
-  "name": "remix-app-template",
-  "description": "",
-  "license": "",
+  "name": "fantomely",
+  "description": "Privacy-first web analytics",
+  "license": "EUPL-1.2",
   "author": {
     "name": "Antonio Villagra De La Cruz"
   },
-  "homepage": "",
+  "homepage": "https://fantomely.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AntonioVdlC/fantomely.git"
+  },
   "bugs": {
-    "email": ""
+    "url": "https://github.com/AntonioVdlC/fantomely/issues"
   },
   "scripts": {
     "build": "npm run build:css && remix build && npm run build:sdk",

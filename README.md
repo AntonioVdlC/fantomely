@@ -18,10 +18,6 @@ cp .env.sample .env
 ```
 
 ```sh
-DATABASE_URL="postgresql://root:root@localhost:5432/analytics-service-db"
-```
-
-```sh
 make up
 ```
 

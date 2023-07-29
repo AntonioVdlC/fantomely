@@ -1,5 +1,6 @@
 import { Website } from "@prisma/client";
 import { db } from "./db.server";
+import { getDateComponents } from "./date";
 
 export async function getPageViewsLastHour({
   website,
@@ -8,48 +9,43 @@ export async function getPageViewsLastHour({
   website: Website;
   currentDate: Date;
 }) {
-  const year = currentDate.getUTCFullYear();
-  const month = currentDate.getUTCMonth() + 1;
-  const day = currentDate.getUTCDate();
-  const hour = currentDate.getUTCHours();
-
-  const value = { current: 0, previous: 0 };
+  const { year, month, day, hour } = getDateComponents(currentDate);
 
   // Current
-  const eventsCurrent = await db.event.findMany({
-    where: {
-      websiteId: website.id,
-      period: { year, month, day, hour },
-    },
-  });
-
-  value.current = eventsCurrent.reduce((sum, event) => (sum += event.count), 0);
+  const current =
+    (await db.event.count({
+      where: {
+        websiteId: website.id,
+        period: { year, month, day, hour },
+      },
+    })) || 0;
 
   // Previous
   const previousDate = new Date(currentDate.getTime() - 60 * 60 * 1000);
-  const previousYear = previousDate.getUTCFullYear();
-  const previousMonth = previousDate.getUTCMonth() + 1;
-  const previousDay = previousDate.getUTCDate();
-  const previousHour = previousDate.getUTCHours();
+  const {
+    year: previousYear,
+    month: previousMonth,
+    day: previousDay,
+    hour: previousHour,
+  } = getDateComponents(previousDate);
 
-  const events = await db.event.findMany({
-    where: {
-      websiteId: website.id,
-      period: {
-        year: previousYear,
-        month: previousMonth,
-        day: previousDay,
-        hour: previousHour,
+  const previous =
+    (await db.event.count({
+      where: {
+        websiteId: website.id,
+        period: {
+          year: previousYear,
+          month: previousMonth,
+          day: previousDay,
+          hour: previousHour,
+        },
       },
-    },
-  });
-
-  value.previous = events.reduce((sum, event) => (sum += event.count), 0);
+    })) || 0;
 
   // Change
-  const change = value.current - value.previous;
+  const change = current - previous;
 
-  return { value, change };
+  return { value: { current, previous }, change };
 }
 
 export async function getPageViewsLastDay({
@@ -59,48 +55,41 @@ export async function getPageViewsLastDay({
   website: Website;
   currentDate: Date;
 }) {
-  const year = currentDate.getUTCFullYear();
-  const month = currentDate.getUTCMonth() + 1;
-  const day = currentDate.getUTCDate();
-
-  const value = { current: 0, previous: 0 };
+  const { year, month, day } = getDateComponents(currentDate);
 
   // Current
-  const eventsCurrent = await db.event.findMany({
-    where: {
-      websiteId: website.id,
-      period: { year, month, day },
-    },
-  });
-
-  value.current = eventsCurrent.reduce((sum, event) => (sum += event.count), 0);
+  const current =
+    (await db.event.count({
+      where: {
+        websiteId: website.id,
+        period: { year, month, day },
+      },
+    })) || 0;
 
   // Previous
   const previousDate = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
-  const previousYear = previousDate.getUTCFullYear();
-  const previousMonth = previousDate.getUTCMonth() + 1;
-  const previousDay = previousDate.getUTCDate();
+  const {
+    year: previousYear,
+    month: previousMonth,
+    day: previousDay,
+  } = getDateComponents(previousDate);
 
-  const events = await db.event.findMany({
-    where: {
-      websiteId: website.id,
-      period: {
-        year: previousYear,
-        month: previousMonth,
-        day: previousDay,
+  const previous =
+    (await db.event.count({
+      where: {
+        websiteId: website.id,
+        period: {
+          year: previousYear,
+          month: previousMonth,
+          day: previousDay,
+        },
       },
-    },
-  });
-
-  value.previous = events.reduce((sum, event) => (sum += event.count), 0);
+    })) || 0;
 
   // Change
-  const change = value.current - value.previous;
+  const change = current - previous;
 
-  return {
-    value,
-    change,
-  };
+  return { value: { current, previous }, change };
 }
 
 export async function getPageViewsLastMonth({
@@ -110,45 +99,37 @@ export async function getPageViewsLastMonth({
   website: Website;
   currentDate: Date;
 }) {
-  const year = currentDate.getUTCFullYear();
-  const month = currentDate.getUTCMonth() + 1;
-
-  const value = { current: 0, previous: 0 };
+  const { year, month } = getDateComponents(currentDate);
 
   // Current
-  const eventsCurrent = await db.event.findMany({
-    where: {
-      websiteId: website.id,
-      period: { year, month },
-    },
-  });
-
-  value.current = eventsCurrent.reduce((sum, event) => (sum += event.count), 0);
+  const current =
+    (await db.event.count({
+      where: {
+        websiteId: website.id,
+        period: { year, month },
+      },
+    })) || 0;
 
   // Previous
   const previousDate = new Date(
     currentDate.getTime() - 30 * 24 * 60 * 60 * 1000
   );
-  const previousYear = previousDate.getUTCFullYear();
-  const previousMonth = previousDate.getUTCMonth() + 1;
+  const { year: previousYear, month: previousMonth } =
+    getDateComponents(previousDate);
 
-  const events = await db.event.findMany({
-    where: {
-      websiteId: website.id,
-      period: {
-        year: previousYear,
-        month: previousMonth,
+  const previous =
+    (await db.event.count({
+      where: {
+        websiteId: website.id,
+        period: {
+          year: previousYear,
+          month: previousMonth,
+        },
       },
-    },
-  });
-
-  value.previous = events.reduce((sum, event) => (sum += event.count), 0);
+    })) || 0;
 
   // Change
-  const change = value.current - value.previous;
+  const change = current - previous;
 
-  return {
-    value,
-    change,
-  };
+  return { value: { current, previous }, change };
 }

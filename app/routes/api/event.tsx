@@ -1,4 +1,4 @@
-import type { ActionFunction } from "remix";
+import type { ActionFunction } from "@remix-run/node";
 
 import { db } from "~/utils/db.server";
 import { parseClientHints } from "~/utils/useragent.server";

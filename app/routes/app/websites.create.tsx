@@ -1,6 +1,6 @@
-import { redirect } from "remix";
+import { redirect } from "@remix-run/node";
 
-import type { ActionFunction } from "remix";
+import type { ActionFunction } from "@remix-run/node";
 
 import { db } from "~/utils/db.server";
 import { generatePublicKey } from "~/utils/api.server";

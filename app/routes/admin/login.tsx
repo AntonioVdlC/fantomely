@@ -1,7 +1,5 @@
-import { Form, useActionData } from "remix";
-
-import type { ActionFunction } from "remix";
-
+import type { ActionFunction } from "@remix-run/node";
+import { useActionData, Form } from "@remix-run/react";
 import { db } from "~/utils/db.server";
 import { send } from "~/utils/email.server";
 import {

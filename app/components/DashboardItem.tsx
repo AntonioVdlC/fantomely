@@ -1,9 +1,9 @@
-import { Link } from "remix";
 import {
   ArrowSmUpIcon,
   ArrowSmDownIcon,
   MinusSmIcon,
 } from "@heroicons/react/outline";
+import { Link } from "@remix-run/react";
 
 import classNames from "~/utils/class-names";
 import { generateWebsiteColor, generateWebsiteInitials } from "~/utils/website";
@@ -28,7 +28,7 @@ type Props = {
 
 export default function DashboardItem({ item }: Props) {
   return (
-    <div className="relative flex overflow-hidden rounded-lg bg-white px-4 pt-4 pb-14 shadow">
+    <div className="relative flex overflow-hidden rounded-lg bg-white px-4 pb-14 pt-4 shadow">
       <div
         className={classNames(
           generateWebsiteColor(item.name),

@@ -1,6 +1,6 @@
-import { redirect } from "remix";
+import { redirect } from "@remix-run/node";
 
-import type { LoaderFunction } from "remix";
+import type { LoaderFunction } from "@remix-run/node";
 
 import { getUserId } from "~/utils/session.server";
 

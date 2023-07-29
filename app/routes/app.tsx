@@ -1,12 +1,12 @@
-import { useLoaderData, Outlet, redirect } from "remix";
-
-import type { LoaderFunction } from "remix";
 import type { User, Website } from "@prisma/client";
 
 import { requireCurrentUser } from "~/utils/session.server";
 import { db } from "~/utils/db.server";
 
 import AppContainer from "~/components/AppContainer";
+import type { LoaderFunction } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
+import { useLoaderData, Outlet } from "@remix-run/react";
 
 type LoaderData = {
   user: User;

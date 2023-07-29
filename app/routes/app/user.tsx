@@ -1,6 +1,3 @@
-import { Form, json, useLoaderData, useTransition } from "remix";
-
-import type { ActionFunction, LoaderFunction } from "remix";
 import type { User } from "@prisma/client";
 
 import { db } from "~/utils/db.server";
@@ -10,6 +7,9 @@ import H2 from "~/components/SectionHeader";
 import LayoutGrid from "~/components/LayoutGrid";
 import Input from "~/components/Input";
 import Button from "~/components/Button";
+import { json } from "@remix-run/node";
+import type { LoaderFunction, ActionFunction } from "@remix-run/node";
+import { useLoaderData, Form, useTransition } from "@remix-run/react";
 
 type LoaderData = {
   user: User;

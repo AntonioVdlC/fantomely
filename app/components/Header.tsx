@@ -1,10 +1,10 @@
 import { Fragment } from "react";
-import { Link } from "remix";
 import { Popover, Transition } from "@headlessui/react";
 import { MenuIcon, XIcon } from "@heroicons/react/outline";
 
 import Button from "~/components/Button";
 import Logo from "~/components/Logo";
+import { Link } from "@remix-run/react";
 
 type Props = {
   isUserLoggedIn: boolean;
@@ -94,7 +94,7 @@ export default function Header({ isUserLoggedIn }: Props) {
                 </Popover.Button>
               </div>
             </div>
-            <div className="pt-5 pb-6">
+            <div className="pb-6 pt-5">
               <div className="space-y-1 px-2">
                 {navigation.map((item) => (
                   <Link

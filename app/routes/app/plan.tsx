@@ -1,6 +1,4 @@
-import { useLoaderData } from "remix";
-
-import type { LoaderFunction } from "remix";
+import type { LoaderFunction } from "@remix-run/node";
 import type { Plan } from "@prisma/client";
 
 import { db } from "~/utils/db.server";
@@ -9,6 +7,7 @@ import { requireCurrentUser } from "~/utils/session.server";
 import Button from "~/components/Button";
 import H2 from "~/components/SectionHeader";
 import LayoutGrid from "~/components/LayoutGrid";
+import { useLoaderData } from "@remix-run/react";
 
 type LoaderData = {
   plan: Plan;

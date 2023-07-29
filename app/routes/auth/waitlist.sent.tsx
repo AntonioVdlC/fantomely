@@ -1,10 +1,11 @@
-import { Link, redirect, useSearchParams } from "remix";
+import { redirect } from "@remix-run/node";
 
-import type { LoaderFunction } from "remix";
+import type { LoaderFunction } from "@remix-run/node";
 
 import { getUserId } from "~/utils/session.server";
 
 import Logo from "~/components/Logo";
+import { Link, useSearchParams } from "@remix-run/react";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await getUserId(request);

@@ -1,13 +1,11 @@
-import { Link, useLoaderData } from "remix";
-
-import type { LoaderFunction } from "remix";
-
 import { getUserId } from "~/utils/session.server";
 
 import Button from "~/components/Button";
 import Footer from "~/components/Footer";
 import Header from "~/components/Header";
 import PageHeading from "~/components/PageHeading";
+import type { LoaderFunction } from "@remix-run/node";
+import { useLoaderData, Link } from "@remix-run/react";
 
 type LoaderData = {
   isUserLoggedIn: boolean;
@@ -74,7 +72,7 @@ export default function ContributeScreen() {
                     className="block w-full rounded-md border border-slate-300 px-4 py-3 text-base text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-300  focus:ring-offset-2 focus:ring-offset-slate-900"
                   />
                 </div>
-                <div className="mt-3 sm:mt-0 sm:ml-3">
+                <div className="mt-3 sm:ml-3 sm:mt-0">
                   <Button primary type="submit">
                     Join the wailist
                   </Button>

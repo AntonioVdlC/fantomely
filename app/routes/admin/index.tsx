@@ -1,6 +1,7 @@
-import { Outlet, redirect } from "remix";
+import { redirect } from "@remix-run/node";
+import type { LoaderFunction } from "@remix-run/node";
 
-import type { LoaderFunction } from "remix";
+import { Outlet } from "@remix-run/react";
 
 import { requireAdminSession } from "~/utils/session.server";
 

@@ -1,10 +1,9 @@
-import { Link } from "remix";
-
 import classNames from "~/utils/class-names";
 
 import Logo from "~/components/Logo";
 
 import type { NavigationItem } from "~/components/AppContainer";
+import { Link } from "@remix-run/react";
 
 type Props = {
   navigation: {

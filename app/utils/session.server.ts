@@ -1,8 +1,8 @@
-import { createCookieSessionStorage, redirect } from "remix";
 import crypto from "crypto";
 import { db } from "~/utils/db.server";
 
 import type { AdminSession, Org, User, UserOrg } from "@prisma/client";
+import { createCookieSessionStorage, redirect } from "@remix-run/node";
 
 type RegisterForm = {
   email: string;

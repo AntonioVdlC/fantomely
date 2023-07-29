@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
+import { BarGroup, BarSeries, XYChart } from "@visx/xychart";
 import { useState } from "react";
-import ReactApexChart from "react-apexcharts";
+import type { BarDataPoint, DashboardElement } from "~/types/dashboard";
 
 type Props = {
-  categories: string[];
-  data: number[];
-  elements: Array<{ id: string }>;
+  data: DashboardElement[];
+  dataKey: string;
   limit?: number;
   onClick?: (id: string) => void;
 };
@@ -14,104 +14,55 @@ type Props = {
 const VIEW_LIMIT = 5;
 
 export default function BarChart({
-  categories,
   data,
-  elements,
+  dataKey,
   limit = VIEW_LIMIT,
   onClick = () => null,
 }: Props) {
   const [viewAll, setViewAll] = useState(false);
 
-  const options = {
-    chart: {
-      type: "bar",
-      height: 55 * (viewAll || data.length < limit ? data.length : limit) + 55,
-      offsetX: -25,
-      offsetY: -25,
-      toolbar: {
-        show: true,
-        offsetX: -30,
-        offsetY: -23,
-      },
-      events: {
-        click(_: never, __: never, config: { dataPointIndex: number }) {
-          onClick(elements[config.dataPointIndex].id);
-        },
-      },
-    },
-    plotOptions: {
-      bar: {
-        borderRadius: 4,
-        horizontal: true,
-        barHeight: "80%",
-        dataLabels: {
-          position: "bottom",
-        },
-      },
-    },
-    dataLabels: {
-      enabled: true,
-      textAnchor: "start",
-      style: {
-        colors: ["#1e293b"],
-        fontWeight: 400,
-      },
-      formatter: function (_: any, opt: any) {
-        return opt.w.globals.labels[opt.dataPointIndex];
-      },
-      offsetX: 10,
-      dropShadow: {
-        enabled: false,
-      },
-    },
-    colors: ["#e2e8f0"],
-    tooltip: {
-      y: {
-        formatter(val: number) {
-          return Math.round(val);
-        },
-      },
-    },
-    xaxis: {
-      categories,
-      axisBorder: {
-        show: true,
-        color: "#1e293b",
-      },
-      axisTicks: {
-        show: false,
-      },
-      labels: {
-        formatter(val: number) {
-          return Math.round(val);
-        },
-      },
-    },
-    yaxis: {
-      labels: {
-        show: false,
-      },
-    },
-  };
+  const series: Array<BarDataPoint> = data
+    .filter((datum) => datum.count)
+    .sort((a, b) => a.count - b.count)
+    .map((datum) => ({
+      id: datum.id,
+      count: datum.count,
+      label: String(datum.value),
+      // new Date(
+      //   new Date(period.value).setHours(0, 0, 0, 0)
+      // ).toLocaleDateString(undefined, {
+      //   year: "2-digit",
+      //   month: "short",
+      //   day: "numeric",
+      // }),
+    }));
 
-  const series = [
-    {
-      name: "Page Views",
-      data: viewAll ? data : data.slice(0, limit),
-    },
-  ];
+  const height =
+    55 * (1 + (viewAll || data.length < limit ? data.length : limit));
+
+  const accessors = {
+    xAccessor: (datum: BarDataPoint) => datum.count,
+    yAccessor: (datum: BarDataPoint) => datum.label,
+  };
 
   return (
     <div className="relative">
-      {/* @ts-ignore */}
-      <ReactApexChart
-        options={options}
-        series={series}
-        type={options.chart.type}
-        height={options.chart.height}
-      />
+      <XYChart
+        height={height}
+        xScale={{ type: "linear" }}
+        yScale={{ type: "band" }}
+        onPointerUp={({ datum }) => onClick((datum as BarDataPoint).id)}
+      >
+        <BarGroup>
+          <BarSeries
+            dataKey={dataKey}
+            data={viewAll ? series : series.slice(0, limit)}
+            {...accessors}
+          ></BarSeries>
+        </BarGroup>
+      </XYChart>
       {data.length > limit ? (
-        <div className="absolute top-[-20px] right-[70px] text-xs text-slate-500 hover:text-slate-400">
+        <div className="absolute right-[70px] top-[-20px] text-xs text-slate-500 hover:text-slate-400">
           <a onClick={() => setViewAll(!viewAll)}>
             {viewAll ? "View Less" : "View More"}
           </a>

@@ -1,12 +1,7 @@
-import {
-  ActionFunction,
-  Form,
-  LoaderFunction,
-  redirect,
-  useLoaderData,
-} from "remix";
-
 import type { User } from "@prisma/client";
+import { redirect, ActionFunction } from "@remix-run/node";
+import type { LoaderFunction } from "@remix-run/node";
+import { useLoaderData, Form } from "@remix-run/react";
 
 import { db } from "~/utils/db.server";
 import { send, templates } from "~/utils/email.server";

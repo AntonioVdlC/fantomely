@@ -1,12 +1,10 @@
-import { Link, useLoaderData } from "remix";
-
-import type { LoaderFunction } from "remix";
-
 import { getUserId } from "~/utils/session.server";
 
 import Button from "~/components/Button";
 import Footer from "~/components/Footer";
 import Header from "~/components/Header";
+import type { LoaderFunction } from "@remix-run/node";
+import { useLoaderData, Link } from "@remix-run/react";
 
 type LoaderData = {
   isUserLoggedIn: boolean;
@@ -27,7 +25,7 @@ export default function PricingScreen() {
     <div className="relative bg-slate-50">
       <Header isUserLoggedIn={data.isUserLoggedIn} />
       <div className="relative bg-slate-600">
-        <div className="mx-auto max-w-7xl py-3 px-3 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-3 py-3 sm:px-6 lg:px-8">
           <div className="pr-16 sm:px-16 sm:text-center">
             <p className="font-medium text-slate-50">
               <span className="md:hidden">
@@ -85,7 +83,7 @@ export default function PricingScreen() {
                       className="block w-full rounded-md border border-slate-300 px-4 py-3 text-base text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-300  focus:ring-offset-2 focus:ring-offset-slate-900"
                     />
                   </div>
-                  <div className="mt-3 sm:mt-0 sm:ml-3">
+                  <div className="mt-3 sm:ml-3 sm:mt-0">
                     <Button primary type="submit">
                       Join the wailist
                     </Button>

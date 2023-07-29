@@ -1,5 +1,4 @@
-import { Link } from "remix";
-
+import { Link } from "@remix-run/react";
 import Logo from "~/components/Logo";
 import classNames from "~/utils/class-names";
 
@@ -21,7 +20,7 @@ export default function ErrorPage({
 }: Props) {
   return (
     <>
-      <div className="flex min-h-full flex-col bg-slate-50 pt-16 pb-12">
+      <div className="flex min-h-full flex-col bg-slate-50 pb-12 pt-16">
         <main className="mx-auto flex w-full max-w-7xl flex-grow flex-col justify-center px-4 sm:px-6 lg:px-8">
           <div
             className={classNames(

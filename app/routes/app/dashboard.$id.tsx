@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link, redirect, useLoaderData, useNavigate } from "remix";
 
-import type { LoaderFunction } from "remix";
+import { redirect } from "@remix-run/node";
+import type { LoaderFunction } from "@remix-run/node";
 import type {
   Browser,
-  Event,
   Path,
-  Period,
   Platform,
   Referrer,
   Website,
@@ -21,28 +19,19 @@ import classNames from "~/utils/class-names";
 import { generateWebsiteColor, generateWebsiteInitials } from "~/utils/website";
 
 import BarChart from "~/components/BarChart.client";
-import BrushChart from "~/components/BrushChart.client";
+// import BrushChart from "~/components/BrushChart.client";
 import Button from "~/components/Button";
 import H2 from "~/components/SectionHeader";
 import LayoutGrid from "~/components/LayoutGrid";
 import Loading from "~/components/Loading";
 
 import illustration from "~/assets/illustration_dashboard_empty.svg";
-
-type DashboardElement = {
-  id: string;
-  value: string | number;
-  count: number;
-};
+import { dateDaysAgo } from "~/utils/date";
+import { useLoaderData, useNavigate, Link } from "@remix-run/react";
+import type { DashboardElement } from "~/types/dashboard";
 
 type LoaderData = {
   website: Website;
-  events: (Event & {
-    path: Path;
-    period: Period;
-    browser?: Browser;
-    platform?: Platform;
-  })[];
   element: Path | Browser | Platform | Referrer | undefined;
   paths: DashboardElement[];
   periods: DashboardElement[];
@@ -77,7 +66,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     throw new Response("Website not found", { status: 404 });
   }
 
-  let where = { websiteId: website.id };
+  let where = { websiteId: website.id, createdAt: { gte: dateDaysAgo(90) } };
   if (el && ["path", "browser", "platform", "referrer"].includes(el) && elId) {
     where = { ...where, [`${el}Id`]: elId };
   }
@@ -218,7 +207,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   return {
     website,
-    events,
     element,
     paths,
     periods: filledPeriods,
@@ -251,7 +239,7 @@ export default function DashboardRoute() {
             >
               {generateWebsiteInitials(data.website.name)}
             </div>
-            <div className="flex flex-1 items-center justify-between truncate rounded-r-md border-t border-r border-b border-slate-200 bg-white shadow-sm">
+            <div className="flex flex-1 items-center justify-between truncate rounded-r-md border-b border-r border-t border-slate-200 bg-white shadow-sm">
               <div className="flex-1 truncate px-4 py-2 text-sm">
                 <Link
                   to={`/app/websites/details/${data.website.id}`}
@@ -294,19 +282,20 @@ export default function DashboardRoute() {
         )}
       </LayoutGrid>
 
-      <hr className="mt-4 mb-6" />
+      <hr className="mb-6 mt-4" />
 
       <div className="mt-3">
         <H2>Page Views Chart</H2>
         <div className="mt-1">
           {isMounted ? (
-            <BrushChart
-              key={data.element?.id || data.website.id}
-              data={data.periods.map((period) => [
-                new Date(period.value).getTime(),
-                period.count,
-              ])}
-            />
+            // <BrushChart
+            //   key={data.element?.id || data.website.id}
+            //   data={data.periods.map((period) => [
+            //     new Date(period.value).getTime(),
+            //     period.count,
+            //   ])}
+            // />
+            <div></div>
           ) : (
             <div className="flex flex-col items-center">
               <Loading />
@@ -315,7 +304,7 @@ export default function DashboardRoute() {
         </div>
       </div>
 
-      <hr className="mt-4 mb-6" />
+      <hr className="mb-6 mt-4" />
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3 4xl:grid-cols-4">
         <div>
@@ -324,25 +313,8 @@ export default function DashboardRoute() {
             {isMounted ? (
               <BarChart
                 key={data.element?.id || data.website.id}
-                data={data.periods
-                  .filter((period) => period.count)
-                  .sort((a, b) => b.count - a.count)
-                  .map((period) => period.count)}
-                categories={data.periods
-                  .filter((period) => period.count)
-                  .sort((a, b) => b.count - a.count)
-                  .map((period) =>
-                    new Date(
-                      new Date(period.value).setHours(0, 0, 0, 0)
-                    ).toLocaleDateString(undefined, {
-                      year: "2-digit",
-                      month: "short",
-                      day: "numeric",
-                    })
-                  )}
-                elements={data.periods.map((period) => ({
-                  id: period.id,
-                }))}
+                dataKey="bar-dates"
+                data={data.periods}
               />
             ) : (
               <div className="flex flex-col items-center">
@@ -357,15 +329,8 @@ export default function DashboardRoute() {
             {isMounted ? (
               <BarChart
                 key={data.element?.id || data.website.id}
-                data={data.paths
-                  .sort((a, b) => b.count - a.count)
-                  .map((path) => path.count)}
-                categories={data.paths
-                  .sort((a, b) => b.count - a.count)
-                  .map((path) => String(path.value))}
-                elements={data.paths.map((path) => ({
-                  id: path.id,
-                }))}
+                dataKey="bar-pages"
+                data={data.paths}
                 onClick={(id) =>
                   navigate(
                     `/app/dashboard/${data.website.id}?el=path&elId=${id}`
@@ -385,15 +350,8 @@ export default function DashboardRoute() {
             {isMounted ? (
               <BarChart
                 key={data.element?.id || data.website.id}
-                data={data.browsers
-                  .sort((a, b) => b.count - a.count)
-                  .map((browser) => browser.count)}
-                categories={data.browsers
-                  .sort((a, b) => b.count - a.count)
-                  .map((browser) => String(browser.value))}
-                elements={data.browsers.map((browser) => ({
-                  id: browser.id,
-                }))}
+                dataKey="bar-browsers"
+                data={data.browsers}
                 onClick={(id) =>
                   navigate(
                     `/app/dashboard/${data.website.id}?el=browser&elId=${id}`
@@ -413,15 +371,8 @@ export default function DashboardRoute() {
             {isMounted ? (
               <BarChart
                 key={data.element?.id || data.website.id}
-                data={data.platforms
-                  .sort((a, b) => b.count - a.count)
-                  .map((platform) => platform.count)}
-                categories={data.platforms
-                  .sort((a, b) => b.count - a.count)
-                  .map((platform) => String(platform.value))}
-                elements={data.platforms.map((platform) => ({
-                  id: platform.id,
-                }))}
+                dataKey="bar-platforms"
+                data={data.platforms}
                 onClick={(id) =>
                   navigate(
                     `/app/dashboard/${data.website.id}?el=platform&elId=${id}`
@@ -442,15 +393,8 @@ export default function DashboardRoute() {
               {isMounted ? (
                 <BarChart
                   key={data.element?.id || data.website.id}
-                  data={data.referrers
-                    .sort((a, b) => b.count - a.count)
-                    .map((referrer) => referrer.count)}
-                  categories={data.referrers
-                    .sort((a, b) => b.count - a.count)
-                    .map((referrer) => String(referrer.value))}
-                  elements={data.referrers.map((referrer) => ({
-                    id: referrer.id,
-                  }))}
+                  dataKey="bar-referrers"
+                  data={data.referrers}
                   onClick={(id) =>
                     navigate(
                       `/app/dashboard/${data.website.id}?el=referrer&elId=${id}`

@@ -1,7 +1,9 @@
-import { Form, json, redirect, useActionData, useTransition } from "remix";
+import { json, redirect } from "@remix-run/node";
 import { Role } from "@prisma/client";
 
-import type { ActionFunction, LoaderFunction } from "remix";
+import { Form, useActionData, useTransition } from "@remix-run/react";
+
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 
 import { db } from "~/utils/db.server";
 import {
@@ -109,7 +111,7 @@ export default function OnboardingOrgCreationRoute() {
   return (
     <>
       <div className="w-screen">
-        <div className="bg-slate-50 pt-10 sm:pt-16 lg:overflow-hidden lg:pt-8 lg:pb-14">
+        <div className="bg-slate-50 pt-10 sm:pt-16 lg:overflow-hidden lg:pb-14 lg:pt-8">
           <div className="mx-auto max-w-7xl px-8">
             <div className="lg:grid lg:grid-cols-2 lg:gap-8">
               <div className="mx-auto max-w-sm px-4 sm:px-6 sm:text-center lg:flex lg:items-center lg:px-0 lg:text-left">

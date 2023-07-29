@@ -1,6 +1,5 @@
-import { redirect, useLoaderData } from "remix";
-
-import type { LoaderFunction } from "remix";
+import { redirect } from "@remix-run/node";
+import type { LoaderFunction } from "@remix-run/node";
 import type { Website } from "@prisma/client";
 
 import { db } from "~/utils/db.server";
@@ -12,6 +11,7 @@ import {
 } from "~/utils/stats.server";
 
 import DashboardSection from "~/components/DashboardSection";
+import { useLoaderData } from "@remix-run/react";
 
 type PageViewsItem = {
   value: {

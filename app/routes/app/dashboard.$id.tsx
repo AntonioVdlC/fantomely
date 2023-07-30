@@ -11,10 +11,7 @@ import type {
 } from "@prisma/client";
 
 import { db } from "~/utils/db.server";
-import {
-  generateRandomString,
-  requireCurrentUser,
-} from "~/utils/session.server";
+import { requireCurrentUser } from "~/utils/session.server";
 import classNames from "~/utils/class-names";
 import { generateWebsiteColor, generateWebsiteInitials } from "~/utils/website";
 
@@ -26,8 +23,7 @@ import LayoutGrid from "~/components/LayoutGrid";
 import Loading from "~/components/Loading";
 
 import illustration from "~/assets/illustration_dashboard_empty.svg";
-import { dateDaysAgo } from "~/utils/date";
-import { useLoaderData, useNavigate, Link } from "@remix-run/react";
+import { useLoaderData, Link } from "@remix-run/react";
 import type { DashboardElement } from "~/types/dashboard";
 
 type LoaderData = {
@@ -40,20 +36,8 @@ type LoaderData = {
   referrers: DashboardElement[];
 };
 
-type ElementKey = "path" | "browser" | "platform" | "referrer" | undefined;
-
 export const loader: LoaderFunction = async ({ request, params }) => {
-  const { searchParams } = new URL(request.url);
   const websiteId = params.id;
-  const el: ElementKey =
-    searchParams.get("el") &&
-    ["path", "browser", "platform", "referrer"].includes(
-      searchParams.get("el")?.toString() ?? ""
-    )
-      ? (searchParams.get("el") as ElementKey)
-      : undefined;
-  const elId = searchParams.get("elId");
-
   if (!websiteId) {
     return redirect("/app/");
   }
@@ -66,150 +50,58 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     throw new Response("Website not found", { status: 404 });
   }
 
-  let where = { websiteId: website.id, createdAt: { gte: dateDaysAgo(90) } };
-  if (el && ["path", "browser", "platform", "referrer"].includes(el) && elId) {
-    where = { ...where, [`${el}Id`]: elId };
-  }
-
-  const events = await db.event.findMany({
-    where,
-    include: {
-      path: true,
-      period: true,
-      browser: true,
-      platform: true,
-      referrer: true,
-    },
-    orderBy: { period: { createdAt: "asc" } },
-  });
-
-  let element;
-  if (el && ["path", "browser", "platform", "referrer"].includes(el) && elId) {
-    const event = events.find((event) => Boolean(event[el]));
-    if (event) {
-      element = event[el];
-    }
-  }
-
-  const paths: DashboardElement[] = [];
-  const periods: (DashboardElement & {
-    year: number;
-    month: number;
-    day: number;
-  })[] = [];
-  const filledPeriods: DashboardElement[] = [];
-  const browsers: DashboardElement[] = [];
-  const platforms: DashboardElement[] = [];
-  const referrers: DashboardElement[] = [];
-  events.forEach((event) => {
-    const path = paths.find((path) => path.id === event.pathId);
-    if (path) {
-      path.count += event.count;
-    } else {
-      paths.push({
-        id: event.pathId,
-        value: event.path.value.replace(website.url, ""),
-        count: event.count,
-      });
-    }
-
-    const period = periods.find(
-      (period) =>
-        period.year === event.period.year &&
-        period.month === event.period.month &&
-        period.day === event.period.day
-    );
-    if (period) {
-      period.count += event.count;
-    } else {
-      periods.push({
-        id: event.periodId,
-        value: Date.UTC(
-          event.period.year,
-          event.period.month - 1,
-          event.period.day
-        ),
-        year: event.period.year,
-        month: event.period.month,
-        day: event.period.day,
-        count: event.count,
-      });
-    }
-
-    if (event.browser) {
-      const browser = browsers.find(
-        (browser) => browser.id === event.browser?.id
-      );
-      if (browser) {
-        browser.count += event.count;
-      } else {
-        browsers.push({
-          id: event.browser.id,
-          value: event.browser.value,
-          count: event.count,
-        });
-      }
-    }
-
-    if (event.platform) {
-      const platform = platforms.find(
-        (platform) => platform.id === event.platform?.id
-      );
-      if (platform) {
-        platform.count += event.count;
-      } else {
-        platforms.push({
-          id: event.platform.id,
-          value: event.platform.value,
-          count: event.count,
-        });
-      }
-    }
-
-    if (event.referrer) {
-      const referrer = referrers.find(
-        (referrer) => referrer.id === event.referrer?.id
-      );
-      if (referrer) {
-        referrer.count += event.count;
-      } else {
-        referrers.push({
-          id: event.referrer.id,
-          value: event.referrer.value,
-          count: event.count,
-        });
-      }
-    }
-  });
-
-  if (periods.length) {
-    for (
-      let i = 0, date = periods[0].value as number;
-      i < periods.length || date < Date.now();
-      date += 24 * 60 * 60 * 1000
-    ) {
-      if (periods[i]?.value === date) {
-        filledPeriods.push({
-          id: periods[i].id,
-          value: periods[i].value,
-          count: periods[i].count,
-        });
-        i++;
-        continue;
-      }
-      filledPeriods.push({
-        id: generateRandomString(8),
-        value: date,
-        count: 0,
-      });
-    }
-  }
+  const [periods, browsers, paths, platforms, referrers] = await Promise.all([
+    db.$queryRaw<DashboardElement[]>`
+      SELECT
+        "Period"."id",
+        MAKE_DATE("Period"."year", "Period"."month", "Period"."day") as "label",
+        COUNT(*) as "count"
+      FROM "Event" INNER JOIN "Period" ON "Event"."periodId" = "Period"."id"
+      WHERE "Event"."websiteId" = ${website.id}
+      GROUP BY 1, 2
+      ORDER BY 2 ASC`,
+    db.$queryRaw<DashboardElement[]>`
+      SELECT
+        "Browser"."id",
+        "Browser"."value" as "label",
+        COUNT(*) as "count"
+      FROM "Event" INNER JOIN "Browser" ON "Event"."browserId" = "Browser"."id"
+      WHERE "Event"."websiteId" = ${website.id}
+      GROUP BY 1, 2
+      ORDER BY 3 DESC`,
+    db.$queryRaw<DashboardElement[]>`
+      SELECT
+        "Path"."id",
+        "Path"."value" as "label",
+        COUNT(*) as "count"
+      FROM "Event" INNER JOIN "Path" ON "Event"."pathId" = "Path"."id"
+      WHERE "Event"."websiteId" = ${website.id}
+      GROUP BY 1, 2
+      ORDER BY 3 DESC`,
+    db.$queryRaw<DashboardElement[]>`
+      SELECT
+        "Platform"."id",
+        "Platform"."value" as "label",
+        COUNT(*) as "count"
+      FROM "Event" INNER JOIN "Platform" ON "Event"."platformId" = "Platform"."id"
+      WHERE "Event"."websiteId" = ${website.id}
+      GROUP BY 1, 2
+      ORDER BY 3 DESC`,
+    db.$queryRaw<DashboardElement[]>`
+      SELECT
+        "Referrer"."id",
+        "Referrer"."value" as "label",
+        COUNT(*) as "count"
+      FROM "Event" INNER JOIN "Referrer" ON "Event"."referrerId" = "Referrer"."id"
+      WHERE "Event"."websiteId" = ${website.id}
+      GROUP BY 1, 2
+      ORDER BY 3 DESC`,
+  ]);
 
   return {
     website,
-    element,
     paths,
-    periods: filledPeriods,
+    periods,
     platforms,
     browsers,
     referrers,
@@ -221,8 +113,6 @@ export default function DashboardRoute() {
 
   const [isMounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-
-  const navigate = useNavigate();
 
   return data.periods.length ? (
     <>
@@ -261,25 +151,6 @@ export default function DashboardRoute() {
             </div>
           </div>
         </div>
-
-        {data.element?.value ? (
-          <div>
-            <H2>Viewing subset for</H2>
-            <p className="mt-1">{data.element.value}</p>
-          </div>
-        ) : (
-          <div></div>
-        )}
-
-        {data.element?.value ? (
-          <div>
-            <Button secondary to={`/app/dashboard/${data.website.id}`}>
-              Back to overview
-            </Button>
-          </div>
-        ) : (
-          <div></div>
-        )}
       </LayoutGrid>
 
       <hr className="mb-6 mt-4" />
@@ -308,14 +179,10 @@ export default function DashboardRoute() {
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3 4xl:grid-cols-4">
         <div>
-          <H2>Dates</H2>
-          <div className="mt-1">
+          <H2>Pages</H2>
+          <div className="mt-1 cursor-pointer">
             {isMounted ? (
-              <BarChart
-                key={data.element?.id || data.website.id}
-                dataKey="bar-dates"
-                data={data.periods}
-              />
+              <BarChart dataKey="bar-pages" data={data.paths} />
             ) : (
               <div className="flex flex-col items-center">
                 <Loading />
@@ -324,19 +191,10 @@ export default function DashboardRoute() {
           </div>
         </div>
         <div>
-          <H2>Pages</H2>
+          <H2>Referrers</H2>
           <div className="mt-1 cursor-pointer">
             {isMounted ? (
-              <BarChart
-                key={data.element?.id || data.website.id}
-                dataKey="bar-pages"
-                data={data.paths}
-                onClick={(id) =>
-                  navigate(
-                    `/app/dashboard/${data.website.id}?el=path&elId=${id}`
-                  )
-                }
-              />
+              <BarChart dataKey="bar-referrers" data={data.referrers} />
             ) : (
               <div className="flex flex-col items-center">
                 <Loading />
@@ -348,16 +206,7 @@ export default function DashboardRoute() {
           <H2>Browsers</H2>
           <div className="mt-1 cursor-pointer">
             {isMounted ? (
-              <BarChart
-                key={data.element?.id || data.website.id}
-                dataKey="bar-browsers"
-                data={data.browsers}
-                onClick={(id) =>
-                  navigate(
-                    `/app/dashboard/${data.website.id}?el=browser&elId=${id}`
-                  )
-                }
-              />
+              <BarChart dataKey="bar-browsers" data={data.browsers} />
             ) : (
               <div className="flex flex-col items-center">
                 <Loading />
@@ -369,49 +218,13 @@ export default function DashboardRoute() {
           <H2>Platforms</H2>
           <div className="mt-1 cursor-pointer">
             {isMounted ? (
-              <BarChart
-                key={data.element?.id || data.website.id}
-                dataKey="bar-platforms"
-                data={data.platforms}
-                onClick={(id) =>
-                  navigate(
-                    `/app/dashboard/${data.website.id}?el=platform&elId=${id}`
-                  )
-                }
-              />
+              <BarChart dataKey="bar-platforms" data={data.platforms} />
             ) : (
               <div className="flex flex-col items-center">
                 <Loading />
               </div>
             )}
           </div>
-        </div>
-        <div>
-          <H2>Referrers</H2>
-          {data.referrers.length ? (
-            <div className="mt-1 cursor-pointer">
-              {isMounted ? (
-                <BarChart
-                  key={data.element?.id || data.website.id}
-                  dataKey="bar-referrers"
-                  data={data.referrers}
-                  onClick={(id) =>
-                    navigate(
-                      `/app/dashboard/${data.website.id}?el=referrer&elId=${id}`
-                    )
-                  }
-                />
-              ) : (
-                <div className="flex flex-col items-center">
-                  <Loading />
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="mt-1">
-              <p>No data.</p>
-            </div>
-          )}
         </div>
       </div>
     </>

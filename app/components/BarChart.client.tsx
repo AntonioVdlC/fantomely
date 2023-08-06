@@ -26,7 +26,7 @@ export default function BarChart({
 
     setSeries([
       {
-        name: "Page Views",
+        name: "Views",
         data: displayData.map(({ count, label }) => ({ x: label, y: count })),
       },
     ]);
@@ -87,7 +87,6 @@ export default function BarChart({
         },
       },
       xaxis: {
-        categories: displayData.map(({ label }) => label),
         axisBorder: {
           show: true,
           color: "#1e293b",

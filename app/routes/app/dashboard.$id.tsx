@@ -16,7 +16,7 @@ import classNames from "~/utils/class-names";
 import { generateWebsiteColor, generateWebsiteInitials } from "~/utils/website";
 
 import BarChart from "~/components/BarChart.client";
-// import BrushChart from "~/components/BrushChart.client";
+import TimeSeriesChart from "~/components/TimeSeriesChart.client";
 import Button from "~/components/Button";
 import H2 from "~/components/SectionHeader";
 import LayoutGrid from "~/components/LayoutGrid";
@@ -30,7 +30,7 @@ type LoaderData = {
   website: Website;
   element: Path | Browser | Platform | Referrer | undefined;
   paths: DashboardElement[];
-  periods: DashboardElement[];
+  periods: Omit<DashboardElement, "id">[];
   browsers: DashboardElement[];
   platforms: DashboardElement[];
   referrers: DashboardElement[];
@@ -53,13 +53,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const [periods, browsers, paths, platforms, referrers] = await Promise.all([
     db.$queryRaw<DashboardElement[]>`
       SELECT
-        "Period"."id",
         MAKE_DATE("Period"."year", "Period"."month", "Period"."day") as "label",
         COUNT(*) as "count"
       FROM "Event" INNER JOIN "Period" ON "Event"."periodId" = "Period"."id"
       WHERE "Event"."websiteId" = ${website.id}
-      GROUP BY 1, 2
-      ORDER BY 2 ASC`,
+      GROUP BY 1
+      ORDER BY 1`,
     db.$queryRaw<DashboardElement[]>`
       SELECT
         "Browser"."id",
@@ -159,14 +158,10 @@ export default function DashboardRoute() {
         <H2>Page Views Chart</H2>
         <div className="mt-1">
           {isMounted ? (
-            // <BrushChart
-            //   key={data.element?.id || data.website.id}
-            //   data={data.periods.map((period) => [
-            //     new Date(period.value).getTime(),
-            //     period.count,
-            //   ])}
-            // />
-            <div></div>
+            <TimeSeriesChart
+              key={`brush-chart-${data.website.id}`}
+              data={data.periods}
+            />
           ) : (
             <div className="flex flex-col items-center">
               <Loading />

@@ -182,7 +182,10 @@ export default function DashboardRoute() {
           <H2>Pages</H2>
           <div className="mt-1 cursor-pointer">
             {isMounted ? (
-              <BarChart dataKey="bar-pages" data={data.paths} />
+              <BarChart
+                key={`bar-pages-${data.website.id}`}
+                data={data.paths}
+              />
             ) : (
               <div className="flex flex-col items-center">
                 <Loading />
@@ -194,7 +197,10 @@ export default function DashboardRoute() {
           <H2>Referrers</H2>
           <div className="mt-1 cursor-pointer">
             {isMounted ? (
-              <BarChart dataKey="bar-referrers" data={data.referrers} />
+              <BarChart
+                key={`bar-referrers-${data.website.id}`}
+                data={data.referrers}
+              />
             ) : (
               <div className="flex flex-col items-center">
                 <Loading />
@@ -206,7 +212,10 @@ export default function DashboardRoute() {
           <H2>Browsers</H2>
           <div className="mt-1 cursor-pointer">
             {isMounted ? (
-              <BarChart dataKey="bar-browsers" data={data.browsers} />
+              <BarChart
+                key={`bar-browsers-${data.website.id}`}
+                data={data.browsers}
+              />
             ) : (
               <div className="flex flex-col items-center">
                 <Loading />
@@ -218,7 +227,10 @@ export default function DashboardRoute() {
           <H2>Platforms</H2>
           <div className="mt-1 cursor-pointer">
             {isMounted ? (
-              <BarChart dataKey="bar-platforms" data={data.platforms} />
+              <BarChart
+                key={`bar-platforms-${data.website.id}`}
+                data={data.platforms}
+              />
             ) : (
               <div className="flex flex-col items-center">
                 <Loading />

@@ -1,8 +1,7 @@
-import { Link } from "remix";
-
 import Button from "~/components/Button";
 
 import illustration from "~/assets/illustration_landing.svg";
+import { Link } from "@remix-run/react";
 
 export default function LandingHero() {
   return (
@@ -40,7 +39,7 @@ export default function LandingHero() {
                         className="block w-full rounded-md border border-slate-300 px-4 py-3 text-base text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-300  focus:ring-offset-2 focus:ring-offset-slate-900"
                       />
                     </div>
-                    <div className="mt-3 sm:mt-0 sm:ml-3">
+                    <div className="mt-3 sm:ml-3 sm:mt-0">
                       <Button primary type="submit">
                         Join the wailist
                       </Button>

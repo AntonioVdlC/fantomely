@@ -1,5 +1,6 @@
-import type { LoaderFunction } from "remix";
-import { Link, redirect, useSearchParams } from "remix";
+import type { LoaderFunction } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
+import { Link, useSearchParams } from "@remix-run/react";
 
 import Logo from "~/components/Logo";
 

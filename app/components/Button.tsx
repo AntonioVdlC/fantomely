@@ -1,5 +1,4 @@
-import { Link } from "remix";
-
+import { Link } from "@remix-run/react";
 import type { ButtonHTMLAttributes, HTMLAttributes, ReactChild } from "react";
 
 import spinIcon from "~/assets/tail-spin.svg";

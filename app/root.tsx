@@ -4,11 +4,11 @@ import {
   Outlet,
   Meta,
   Scripts,
-  redirect,
   useCatch,
-} from "remix";
+} from "@remix-run/react";
+import { redirect } from "@remix-run/node";
 
-import type { LoaderFunction, MetaFunction } from "remix";
+import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 
 import errors, { defaultError } from "~/utils/errors";
 

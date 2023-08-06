@@ -1,5 +1,4 @@
 import { Fragment } from "react";
-import { Link, Form } from "remix";
 import { Menu, Transition } from "@headlessui/react";
 import { DotsVerticalIcon } from "@heroicons/react/outline";
 
@@ -7,6 +6,7 @@ import type { Website } from "@prisma/client";
 
 import classNames from "~/utils/class-names";
 import { generateWebsiteColor, generateWebsiteInitials } from "~/utils/website";
+import { Link, Form } from "@remix-run/react";
 
 type Props = {
   website: Website;
@@ -23,7 +23,7 @@ export default function WebsiteListItem({ website }: Props) {
       >
         {generateWebsiteInitials(website.name)}
       </div>
-      <div className="flex flex-1 items-center justify-between truncate rounded-r-md border-t border-r border-b border-slate-200 bg-white shadow-sm">
+      <div className="flex flex-1 items-center justify-between truncate rounded-r-md border-b border-r border-t border-slate-200 bg-white shadow-sm">
         <div className="flex-1 truncate px-4 py-2 text-sm">
           <Link
             to={`/app/websites/details/${website.id}`}
@@ -45,7 +45,7 @@ export default function WebsiteListItem({ website }: Props) {
       </div>
       <Menu as="div" className="relative ml-1 inline-block text-left">
         <div>
-          <Menu.Button className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white bg-transparent text-slate-400 hover:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-500">
+          <Menu.Button className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-transparent bg-white text-slate-400 hover:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-500">
             <span className="sr-only">Open options</span>
             <DotsVerticalIcon className="h-5 w-5" aria-hidden="true" />
           </Menu.Button>

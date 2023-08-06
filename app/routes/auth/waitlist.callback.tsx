@@ -1,6 +1,7 @@
-import { redirect, useCatch } from "remix";
+import { redirect } from "@remix-run/node";
 
-import type { LoaderFunction } from "remix";
+import type { LoaderFunction } from "@remix-run/node";
+import { useCatch } from "@remix-run/react";
 
 import ErrorPage from "~/components/ErrorPage";
 import Loading from "~/components/Loading";

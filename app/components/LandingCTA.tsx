@@ -1,5 +1,4 @@
-import { Link } from "remix";
-
+import { Link } from "@remix-run/react";
 import Button from "~/components/Button";
 
 export default function LandingCTA() {
@@ -8,7 +7,7 @@ export default function LandingCTA() {
       <div aria-hidden="true" className="hidden sm:block">
         <div className="absolute inset-y-0 left-0 w-1/2 rounded-r-3xl bg-slate-100" />
         <svg
-          className="absolute top-8 left-1/2 -ml-3"
+          className="absolute left-1/2 top-8 -ml-3"
           width={404}
           height={392}
           fill="none"
@@ -100,7 +99,7 @@ export default function LandingCTA() {
                   placeholder="Enter your email"
                 />
               </div>
-              <div className="mt-4 sm:mt-0 sm:ml-3">
+              <div className="mt-4 sm:ml-3 sm:mt-0">
                 <Button primary type="submit">
                   Join the wailist
                 </Button>

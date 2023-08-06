@@ -1,13 +1,11 @@
-import { useLoaderData } from "remix";
-
-import type { LoaderFunction } from "remix";
-
 import { getUserId } from "~/utils/session.server";
 
 import Footer from "~/components/Footer";
 import Header from "~/components/Header";
 import { marked } from "marked";
 import PageHeading from "~/components/PageHeading";
+import type { LoaderFunction } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 
 type LoaderData = {
   isUserLoggedIn: boolean;
@@ -53,7 +51,7 @@ Currently, \`fantomely\` is in private beta, and powers the analytics on my [blo
         </PageHeading>
 
         <div
-          className="prose prose-slate mt-16 max-w-none px-12 sm:mt-24 md:prose-lg"
+          className="prose prose-slate mt-16 max-w-none px-12 md:prose-lg sm:mt-24"
           dangerouslySetInnerHTML={{ __html: content }}
         ></div>
       </main>

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useLoaderData, Link, Form, useTransition } from "remix";
 import {
   ExternalLinkIcon,
   ClipboardCopyIcon,
@@ -7,7 +6,7 @@ import {
 } from "@heroicons/react/outline";
 import { Role } from "@prisma/client";
 
-import type { LoaderFunction, ActionFunction } from "remix";
+import type { LoaderFunction, ActionFunction } from "@remix-run/node";
 import type { Org, User, UserOrg, Website } from "@prisma/client";
 
 import classNames from "~/utils/class-names";
@@ -18,6 +17,7 @@ import { generateWebsiteColor, generateWebsiteInitials } from "~/utils/website";
 import H2 from "~/components/SectionHeader";
 import Button from "~/components/Button";
 import LayoutGrid from "~/components/LayoutGrid";
+import { Form, Link, useLoaderData, useTransition } from "@remix-run/react";
 
 type LoaderData = {
   user: User & {
@@ -152,7 +152,7 @@ export default function WebsiteDetailsRoute() {
           className="relative mt-3 max-w-5xl bg-slate-100 p-4 pr-10 text-sm"
           style={{ overflowWrap: "anywhere" }}
         >
-          <span className="absolute top-0 right-0 m-2">
+          <span className="absolute right-0 top-0 m-2">
             {copiedScriptToClipboard ? (
               <span title="Copied">
                 <ClipboardCheckIcon className="inline h-4 w-4 text-green-600" />

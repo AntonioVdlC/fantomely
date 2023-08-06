@@ -1,7 +1,7 @@
-import { redirect } from "remix";
+import { redirect } from "@remix-run/node";
 import { Role } from "@prisma/client";
 
-import type { ActionFunction } from "remix";
+import type { ActionFunction } from "@remix-run/node";
 
 import { db } from "~/utils/db.server";
 import { requireCurrentUser } from "~/utils/session.server";

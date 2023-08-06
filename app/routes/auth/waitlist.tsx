@@ -1,13 +1,6 @@
-import {
-  Form,
-  useActionData,
-  redirect,
-  json,
-  Link,
-  useTransition,
-} from "remix";
+import { redirect, json } from "@remix-run/node";
 
-import type { ActionFunction, LoaderFunction } from "remix";
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 
 import { db } from "~/utils/db.server";
 import { isValidEmail } from "~/utils/is-valid";
@@ -17,6 +10,7 @@ import Button from "~/components/Button";
 import Logo from "~/components/Logo";
 
 import illustration from "~/assets/illustration_waitlist.svg";
+import { useActionData, Form, Link, useTransition } from "@remix-run/react";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await getUserId(request);
@@ -90,7 +84,7 @@ export default function RegisterRoute() {
 
   return (
     <div className="w-screen">
-      <div className="bg-slate-50 pt-10 sm:pt-16 lg:overflow-hidden lg:pt-8 lg:pb-14">
+      <div className="bg-slate-50 pt-10 sm:pt-16 lg:overflow-hidden lg:pb-14 lg:pt-8">
         <div className="mx-auto max-w-7xl px-8">
           <div className="lg:grid lg:grid-cols-2 lg:gap-8">
             <div className="mx-auto max-w-sm px-4 sm:px-6 sm:text-center lg:flex lg:items-center lg:px-0 lg:text-left">

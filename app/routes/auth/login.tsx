@@ -1,14 +1,13 @@
 import {
   Form,
   Link,
-  json,
-  redirect,
   useActionData,
   useSearchParams,
   useTransition,
-} from "remix";
+} from "@remix-run/react";
 
-import type { ActionFunction, LoaderFunction } from "remix";
+import { json, redirect } from "@remix-run/node";
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 
 import { generateMagicLink, getUserId } from "~/utils/session.server";
 import { isValidEmail } from "~/utils/is-valid";
@@ -115,7 +114,7 @@ export default function Login() {
 
   return (
     <div className="w-screen">
-      <div className="bg-slate-50 pt-10 sm:pt-16 lg:overflow-hidden lg:pt-8 lg:pb-14">
+      <div className="bg-slate-50 pt-10 sm:pt-16 lg:overflow-hidden lg:pb-14 lg:pt-8">
         <div className="mx-auto max-w-7xl px-8">
           <div className="lg:grid lg:grid-cols-2 lg:gap-8">
             <div className="mx-auto max-w-sm px-4 sm:px-6 sm:text-center lg:flex lg:items-center lg:px-0 lg:text-left">

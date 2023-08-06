@@ -1,5 +1,4 @@
 import { Fragment } from "react";
-import { Link } from "remix";
 import { Transition, Dialog } from "@headlessui/react";
 import { XIcon } from "@heroicons/react/outline";
 
@@ -8,6 +7,7 @@ import classNames from "~/utils/class-names";
 import Logo from "~/components/Logo";
 
 import type { NavigationItem } from "~/components/AppContainer";
+import { Link } from "@remix-run/react";
 
 type Props = {
   sidebarOpen: boolean;
@@ -60,7 +60,7 @@ export default function AppNavigationMobile({
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <div className="absolute top-0 right-0 -mr-12 pt-2">
+              <div className="absolute right-0 top-0 -mr-12 pt-2">
                 <button
                   type="button"
                   className="ml-1 flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"

@@ -1,9 +1,8 @@
-import { Link } from "remix";
-
 import logo from "~/assets/logo.svg";
 import logoWhite from "~/assets/logo_white.svg";
 import logoText from "~/assets/logo_text.svg";
 import logoTextWhite from "~/assets/logo_text_white.svg";
+import { Link } from "@remix-run/react";
 
 type Props = {
   withText?: boolean;

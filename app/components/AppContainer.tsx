@@ -1,5 +1,4 @@
 import { FC, ReactChild, useEffect, useState } from "react";
-import { useLocation } from "remix";
 import {
   GlobeIcon,
   DocumentReportIcon,
@@ -12,6 +11,7 @@ import type { User, Website } from "@prisma/client";
 import AppNavigationMobile from "~/components/AppNavigationMobile";
 import AppNavigationSide from "~/components/AppNavigationSide";
 import AppNavigationTop from "~/components/AppNavigationTop";
+import { useLocation } from "@remix-run/react";
 
 export type NavigationItem = {
   name: string;

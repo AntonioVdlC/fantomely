@@ -1,68 +1,115 @@
-import * as Plot from "@observablehq/plot";
-import { useEffect, useRef, useState } from "react";
-import type { DashboardElement } from "~/types/dashboard";
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+
+import { useState } from "react";
+import ReactApexChart from "react-apexcharts";
 
 type Props = {
-  data: DashboardElement[];
+  categories: string[];
+  data: number[];
+  elements: Array<{ id: string }>;
   limit?: number;
+  onClick?: (id: string) => void;
 };
 
-const VIEW_LIMIT = 4;
+const VIEW_LIMIT = 5;
 
-export default function BarChart({ data, limit = VIEW_LIMIT }: Props) {
+export default function BarChart({
+  categories,
+  data,
+  elements,
+  limit = VIEW_LIMIT,
+  onClick = () => null,
+}: Props) {
   const [viewAll, setViewAll] = useState(false);
-  const chartContainer = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!data.length) return;
+  const options = {
+    chart: {
+      type: "bar",
+      height: 55 * (viewAll || data.length < limit ? data.length : limit) + 55,
+      offsetX: -25,
+      offsetY: -25,
+      toolbar: {
+        show: true,
+        offsetX: -30,
+        offsetY: -23,
+      },
+      events: {
+        click(_: never, __: never, config: { dataPointIndex: number }) {
+          onClick(elements[config.dataPointIndex].id);
+        },
+      },
+    },
+    plotOptions: {
+      bar: {
+        borderRadius: 4,
+        horizontal: true,
+        barHeight: "80%",
+        dataLabels: {
+          position: "bottom",
+        },
+      },
+    },
+    dataLabels: {
+      enabled: true,
+      textAnchor: "start",
+      style: {
+        colors: ["#1e293b"],
+        fontWeight: 400,
+      },
+      formatter: function (_: any, opt: any) {
+        return opt.w.globals.labels[opt.dataPointIndex];
+      },
+      offsetX: 10,
+      dropShadow: {
+        enabled: false,
+      },
+    },
+    colors: ["#e2e8f0"],
+    tooltip: {
+      y: {
+        formatter(val: number) {
+          return Math.round(val);
+        },
+      },
+    },
+    xaxis: {
+      categories,
+      axisBorder: {
+        show: true,
+        color: "#1e293b",
+      },
+      axisTicks: {
+        show: false,
+      },
+      labels: {
+        formatter(val: number) {
+          return Math.round(val);
+        },
+      },
+    },
+    yaxis: {
+      labels: {
+        show: false,
+      },
+    },
+  };
 
-    const max = data[0].count;
-    const plot = Plot.plot({
-      height: 55 * (1 + (viewAll || data.length < limit ? data.length : limit)),
-      x: { axis: "top", label: null },
-      y: { axis: null, inset: 6 },
-      marks: [
-        Plot.barX(viewAll ? data : data.slice(0, VIEW_LIMIT), {
-          x: "count",
-          y: "label",
-          fill: "steelblue",
-          sort: { y: "-x" },
-        }),
-        Plot.text(viewAll ? data : data.slice(0, VIEW_LIMIT), {
-          x: "count",
-          y: "label",
-          text: (d) => d.label,
-          textAnchor: "end",
-          dx: -30,
-          filter: (d) => d.count / max > 0.5,
-          fill: "white",
-        }),
-        Plot.text(viewAll ? data : data.slice(0, VIEW_LIMIT), {
-          x: "count",
-          y: "label",
-          text: (d) => d.label,
-          textAnchor: "start",
-          dx: 3,
-          filter: (d) => d.count / max <= 0.5,
-          fill: "currentColor",
-        }),
-      ],
-    });
-    chartContainer.current?.append(plot);
-    return () => plot.remove();
-  }, [data, viewAll]);
-
-  if (!data.length) {
-    return (
-      <div className="mt-1">
-        <p>No data.</p>
-      </div>
-    );
-  }
+  const series = [
+    {
+      name: "Page Views",
+      data: viewAll ? data : data.slice(0, limit),
+    },
+  ];
 
   return (
     <div className="relative">
-      <div ref={chartContainer}></div>
+      {/* @ts-ignore */}
+      <ReactApexChart
+        options={options}
+        series={series}
+        type={options.chart.type}
+        height={options.chart.height}
+      />
       {data.length > limit ? (
         <div className="absolute right-[70px] top-[-20px] text-xs text-slate-500 hover:text-slate-400">
           <a onClick={() => setViewAll(!viewAll)}>

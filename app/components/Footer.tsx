@@ -11,10 +11,6 @@ export default function Footer() {
   ];
   const social: Array<{ name: SocialPlatform; href: string }> = [
     {
-      name: "twitter",
-      href: "https://twitter.com/fantome_ly",
-    },
-    {
       name: "github",
       href: "https://github.com/AntonioVdlC/analytics-service",
     },
@@ -22,7 +18,7 @@ export default function Footer() {
 
   return (
     <footer className="mt-24 bg-slate-900 sm:mt-12">
-      <div className="mx-auto max-w-md overflow-hidden py-12 px-4 sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
+      <div className="mx-auto max-w-md overflow-hidden px-4 py-12 sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
         <nav
           className="-mx-5 -my-2 flex flex-wrap justify-center"
           aria-label="Footer"

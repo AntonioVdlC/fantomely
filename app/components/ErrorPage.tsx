@@ -60,12 +60,6 @@ export default function ErrorPage({
               className="inline-block border-l border-slate-300"
               aria-hidden="true"
             />
-            <Link
-              to="https://twitter.com/fantome_ly"
-              className="text-sm font-medium"
-            >
-              Twitter
-            </Link>
           </nav>
         </footer>
       </div>

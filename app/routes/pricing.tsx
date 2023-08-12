@@ -3,6 +3,7 @@ import { getUserId } from "~/utils/session.server";
 import Button from "~/components/Button";
 import Footer from "~/components/Footer";
 import Header from "~/components/Header";
+import PageHeading from "~/components/PageHeading";
 import type { LoaderFunction } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
 
@@ -51,12 +52,14 @@ export default function PricingScreen() {
       <main className="mx-auto flex w-full max-w-7xl flex-grow flex-col justify-center px-4 sm:px-6 lg:px-8">
         <div className="py-16">
           <div className="text-center">
+            <PageHeading>
+              <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl md:text-6xl">
+                <span className="block xl:inline">Pricing</span>
+              </h1>
+            </PageHeading>
             <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">
-              WIP
+              Private Beta
             </p>
-            <h1 className="mt-2 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
-              Pricing
-            </h1>
             <p className="mt-2 text-base text-slate-500 sm:mx-auto sm:max-w-xl">
               We are currently in private beta and haven't totally figured out
               the pricing model. There will most likely be a free tier though,

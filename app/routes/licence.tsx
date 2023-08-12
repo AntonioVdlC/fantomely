@@ -3,6 +3,7 @@ import { readLicence } from "~/utils/licence.server";
 
 import Footer from "~/components/Footer";
 import Header from "~/components/Header";
+import PageHeading from "~/components/PageHeading";
 import type { LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
@@ -30,8 +31,13 @@ export default function LicenceScreen() {
       <Header isUserLoggedIn={data.isUserLoggedIn} />
 
       <main className="mx-auto max-w-7xl px-8">
+        <PageHeading>
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl md:text-6xl">
+            <span className="block xl:inline">Licence</span>
+          </h1>
+        </PageHeading>
         <div
-          className="prose prose-slate max-w-none md:prose-lg lg:prose-xl"
+          className="prose prose-slate mt-16 max-w-none px-12 md:prose-lg sm:mt-24"
           dangerouslySetInnerHTML={{ __html: data.licence }}
         ></div>
       </main>

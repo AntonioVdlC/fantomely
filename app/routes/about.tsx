@@ -78,7 +78,7 @@ export default function AboutScreen() {
           </p>
 
           <p>
-            <span role="img" aria-label="ghost">
+            <span role="img" aria-label="ghost" className="text-4xl">
               👻
             </span>
           </p>
